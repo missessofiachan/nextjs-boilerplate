@@ -1,0 +1,2061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hartwell Primary School — Sustainable Travel System Prototype (Figma Multi-Viewport Canvas S1–S9 | 2-Member Equal Split)</title>
+  <style>
+    :root, [data-theme="scheme-b"] {
+      --scheme-name: "Scheme B: Boroondara Eco-Safe Green (Client Selected)";
+      --primary: #1B5E20;
+      --primary-dark: #0F3D13;
+      --primary-mid: #2E7D32;
+      --primary-light: #E8F5E9;
+      --secondary: #00796B;
+      --secondary-light: #E0F2F1;
+      --bg-app: #F8FAFC;
+      --bg-card: #FFFFFF;
+      --text-main: #111827;
+      --text-muted: #4B5563;
+      --border-color: #CBD5E1;
+      --alert-amber-bg: #FEF3C7;
+      --alert-amber-border: #D97706;
+      --alert-amber-text: #92400E;
+      --alert-crimson-bg: #FEE2E2;
+      --alert-crimson-border: #B91C1C;
+      --alert-crimson-text: #991B1B;
+      --gold-bg: #FEF9C3;
+      --gold-border: #CA8A04;
+      --gold-text: #854D0E;
+    }
+
+    [data-theme="scheme-a"] {
+      --scheme-name: "Scheme A: Municipal Corporate Navy (Rejected)";
+      --primary: #1E3A8A;
+      --primary-dark: #172554;
+      --primary-mid: #1D4ED8;
+      --primary-light: #DBEAFE;
+      --secondary: #0284C7;
+      --secondary-light: #E0F2FE;
+      --bg-app: #F1F5F9;
+      --bg-card: #FFFFFF;
+      --text-main: #334155;
+      --text-muted: #64748B;
+      --border-color: #CBD5E1;
+      --alert-amber-bg: #FEE2E2;
+      --alert-amber-border: #EF4444;
+      --alert-amber-text: #991B1B;
+      --alert-crimson-bg: #FEE2E2;
+      --alert-crimson-border: #EF4444;
+      --alert-crimson-text: #991B1B;
+      --gold-bg: #E0F2FE;
+      --gold-border: #0284C7;
+      --gold-text: #075985;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #0F172A;
+      color: #F8FAFC;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Top Figma / CASE Bar */
+    .case-toolbar {
+      background: #1E293B;
+      border-bottom: 1px solid #334155;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      z-index: 100;
+    }
+
+    .case-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .figma-badge {
+      background: linear-gradient(135deg, #1B5E20, #00796B);
+      color: #fff;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 5px 9px;
+      border-radius: 5px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .case-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #F8FAFC;
+    }
+
+    .case-subtitle {
+      font-size: 11.5px;
+      color: #94A3B8;
+    }
+
+    .toolbar-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-group {
+      display: flex;
+      background: #0F172A;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .tb-btn {
+      background: transparent;
+      color: #94A3B8;
+      border: none;
+      padding: 6px 11px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .tb-btn:hover {
+      color: #FFFFFF;
+      background: #1E293B;
+    }
+
+    .tb-btn.active {
+      background: #1B5E20;
+      color: #FFFFFF;
+    }
+
+    .tb-btn.active-navy {
+      background: #1E3A8A;
+      color: #FFFFFF;
+    }
+
+    .tb-btn.active-mode {
+      background: #0284C7;
+      color: #FFFFFF;
+    }
+
+    /* Main Workspace Layout */
+    .workspace {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Left 9-Screen Navigation Menu */
+    .sidebar {
+      width: 290px;
+      background: #1E293B;
+      border-right: 1px solid #334155;
+      padding: 12px 10px;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .sidebar-group-title {
+      font-size: 10.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4ADE80;
+      margin: 12px 6px 5px 6px;
+    }
+
+    .sidebar-group-title.member-b-hdr {
+      color: #38BDF8;
+    }
+
+    .sidebar-group-title:first-child {
+      margin-top: 2px;
+    }
+
+    .nav-item {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: 1px solid transparent;
+      color: #CBD5E1;
+      padding: 8px 9px;
+      border-radius: 6px;
+      margin-bottom: 4px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      transition: all 0.15s;
+    }
+
+    .nav-item:hover {
+      background: #334155;
+    }
+
+    .nav-item.active {
+      background: rgba(27, 94, 32, 0.3);
+      border-color: #4ADE80;
+      color: #FFFFFF;
+    }
+
+    .nav-item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .nav-badges {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .nav-req-badge {
+      font-size: 9.5px;
+      background: #0F172A;
+      color: #38BDF8;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    .nav-device-tag {
+      font-size: 9px;
+      background: #334155;
+      color: #FDE047;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .nav-item-sub {
+      font-size: 10.5px;
+      color: #94A3B8;
+    }
+
+    /* Center Stage */
+    .stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px;
+      overflow-y: auto;
+      background:
+        radial-gradient(circle at center, #1E293B 0%, #0F172A 100%);
+    }
+
+    /* Device Mode Indicator Banner above Frame */
+    .device-mode-pill {
+      background: #1E293B;
+      border: 1px solid #475569;
+      color: #E2E8F0;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    .device-mode-pill span.highlight {
+      color: #4ADE80;
+    }
+
+    /* Responsive Prototype Frame: Mobile vs Desktop Web vs Classroom Whiteboard */
+    .device-frame {
+      width: 440px;
+      min-height: 750px;
+      background: var(--bg-app);
+      color: var(--text-main);
+      border-radius: 28px;
+      border: 8px solid #334155;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      transition: width 0.25s ease, border-radius 0.25s ease;
+    }
+
+    /* Desktop / Classroom Smartboard Wide Frame (960px) */
+    .device-frame.desktop-frame {
+      width: 960px;
+      min-height: 680px;
+      border-radius: 14px;
+      border: 6px solid #475569;
+    }
+
+    /* Browser Chrome Bar (Visible in Desktop/Whiteboard Mode) */
+    .browser-chrome-bar {
+      display: none;
+      background: #E2E8F0;
+      border-bottom: 1px solid #CBD5E1;
+      padding: 7px 14px;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .device-frame.desktop-frame .browser-chrome-bar {
+      display: flex;
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .w-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .w-dot.r { background: #EF4444; }
+    .w-dot.y { background: #F59E0B; }
+    .w-dot.g { background: #22C55E; }
+
+    .browser-url-box {
+      flex: 1;
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 5px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: #334155;
+      font-family: monospace;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Top Status Bar inside Device */
+    .device-statusbar {
+      background: var(--primary-dark);
+      color: #FFFFFF;
+      padding: 7px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sla-pill {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+    }
+
+    /* App Header inside Device */
+    .app-header {
+      background: var(--primary);
+      color: #FFFFFF;
+      padding: 13px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-bottom: 3px solid var(--secondary);
+    }
+
+    .app-header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .school-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.2px;
+    }
+
+    .contrast-tag {
+      font-size: 10.5px;
+      background: rgba(0, 0, 0, 0.28);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .screen-subtitle-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      opacity: 0.94;
+    }
+
+    /* Screen Content Area */
+    .screen-body {
+      flex: 1;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+    }
+
+    .screen-pane {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .screen-pane.active {
+      display: flex;
+    }
+
+    /* Responsive 2-column layout inside Desktop/Whiteboard screens */
+    .desktop-split {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .device-frame.desktop-frame .desktop-split {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    /* Card & Control Styling */
+    .card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      padding: 13px 15px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 9px;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .req-pill {
+      font-size: 10px;
+      font-weight: 700;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 2px 7px;
+      border-radius: 4px;
+      border: 1px solid var(--primary);
+      white-space: nowrap;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .control-type-hint {
+      font-size: 10px;
+      color: var(--secondary);
+      font-weight: 700;
+    }
+
+    .input-box, .select-box {
+      width: 100%;
+      padding: 9px 11px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      background: #FFFFFF;
+      border: 2px solid var(--secondary);
+      border-radius: 7px;
+    }
+
+    /* Segmented Control */
+    .segmented-control {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      background: #E2E8F0;
+      padding: 3px;
+      border-radius: 8px;
+      gap: 3px;
+    }
+
+    .seg-btn {
+      padding: 7px 4px;
+      text-align: center;
+      font-size: 11.5px;
+      font-weight: 700;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: #475569;
+      cursor: pointer;
+    }
+
+    .seg-btn.active {
+      background: var(--primary);
+      color: #FFFFFF;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    /* OTP Boxes */
+    .otp-row {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin: 4px 0;
+    }
+
+    .otp-digit {
+      width: 42px;
+      height: 44px;
+      border: 2px solid var(--primary);
+      background: var(--primary-light);
+      color: var(--text-main);
+      font-size: 18px;
+      font-weight: 800;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Status Banners */
+    .banner-success {
+      background: var(--primary-light);
+      border-left: 5px solid var(--primary);
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .banner-amber {
+      background: var(--alert-amber-bg);
+      border: 2px solid var(--alert-amber-border);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--alert-amber-text);
+    }
+
+    .banner-crimson {
+      background: var(--alert-crimson-bg);
+      border: 2px solid var(--alert-crimson-border);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--alert-crimson-text);
+    }
+
+    /* Metrics Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .metric-box {
+      background: var(--primary-light);
+      border: 1px solid var(--primary);
+      border-radius: 8px;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .metric-val {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .metric-lbl {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Roster List */
+    .roster-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 8px;
+      border-bottom: 1px solid #E2E8F0;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .roster-row:last-child {
+      border-bottom: none;
+    }
+
+    .status-pill-ok {
+      background: #DCFCE7;
+      color: #166534;
+      border: 1px solid #16A34A;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 12px;
+    }
+
+    .status-pill-warn {
+      background: #FEE2E2;
+      color: #991B1B;
+      border: 1px solid #DC2626;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 12px;
+    }
+
+    /* Toggle Row */
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px dashed #CBD5E1;
+    }
+
+    .toggle-row:last-child {
+      border-bottom: none;
+    }
+
+    .toggle-pill {
+      background: var(--primary);
+      color: #FFFFFF;
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .toggle-pill.locked {
+      background: #0F3D13;
+      border: 1.5px solid #F59E0B;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      width: 100%;
+      background: var(--primary);
+      color: #FFFFFF;
+      border: none;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+
+    .btn-danger-outline {
+      width: 100%;
+      background: #FFF1F2;
+      color: #B91C1C;
+      border: 2px solid #B91C1C;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    /* GAMIFICATION WHITEBOARD PODIUM & BADGES (Screen S8) */
+    .whiteboard-hero {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--secondary) 100%);
+      color: #FFFFFF;
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 2px solid #FACC15;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .trophy-podium-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .podium-card {
+      background: #F8FAFC;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      position: relative;
+    }
+
+    .podium-card.first-place {
+      background: var(--gold-bg);
+      border-color: var(--gold-border);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(202, 138, 4, 0.18);
+    }
+
+    .podium-medal {
+      font-size: 22px;
+      margin-bottom: 2px;
+    }
+
+    .podium-class {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .podium-rate {
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--primary);
+      margin: 2px 0;
+    }
+
+    .podium-sub {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .badges-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .eco-badge-card {
+      background: var(--primary-light);
+      border: 1px solid var(--primary);
+      border-radius: 8px;
+      padding: 7px 8px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .eco-badge-icon {
+      font-size: 18px;
+    }
+
+    .eco-badge-info {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      line-height: 1.25;
+    }
+
+    /* Map Simulation Box */
+    .map-box {
+      background: #E2E8F0;
+      border: 2px solid var(--secondary);
+      border-radius: 8px;
+      height: 135px;
+      position: relative;
+      overflow: hidden;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .map-corridor-line {
+      position: absolute;
+      top: 52%;
+      left: 15px;
+      right: 15px;
+      height: 6px;
+      background: var(--primary);
+      border-radius: 3px;
+    }
+
+    .map-pin {
+      position: relative;
+      z-index: 2;
+      background: var(--primary);
+      color: #FFFFFF;
+      padding: 4px 9px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      display: inline-block;
+      align-self: flex-start;
+    }
+
+    /* Progress Bar */
+    .progress-track {
+      width: 100%;
+      height: 12px;
+      background: #E2E8F0;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 6px;
+    }
+
+    /* Modal Overlay inside Device for Error Prevention (#5) */
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 50;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #FFFFFF;
+      border: 3px solid #B91C1C;
+      border-radius: 14px;
+      padding: 18px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+      color: #111827;
+    }
+
+    .modal-badge {
+      display: inline-block;
+      background: #FEE2E2;
+      color: #991B1B;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .modal-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #991B1B;
+      margin-bottom: 6px;
+    }
+
+    .modal-desc {
+      font-size: 12px;
+      color: #374151;
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .btn-cancel {
+      background: #E5E7EB;
+      color: #1F2937;
+      border: none;
+      padding: 9px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-confirm-sos {
+      background: #B91C1C;
+      color: #FFFFFF;
+      border: none;
+      padding: 9px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Persistent Bottom Navigation Bar (5 Tabs) */
+    .bottom-nav {
+      background: #FFFFFF;
+      border-top: 2px solid var(--border-color);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      padding: 6px 4px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #64748B;
+      cursor: pointer;
+      padding: 4px 2px;
+      border-radius: 6px;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    /* Figma Version History Panel (Right Drawer) */
+    .version-history-drawer {
+      width: 330px;
+      background: #1E293B;
+      border-left: 1px solid #334155;
+      padding: 14px;
+      overflow-y: auto;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .version-history-drawer.open {
+      display: flex;
+    }
+
+    .vh-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 8px;
+    }
+
+    .vh-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #F8FAFC;
+    }
+
+    .vh-item {
+      background: #0F172A;
+      border: 1px solid #334155;
+      border-left: 4px solid #22C55E;
+      border-radius: 8px;
+      padding: 9px 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .vh-item.member-b { border-left-color: #38BDF8; }
+    .vh-item.co-owned { border-left-color: #A855F7; }
+
+    .vh-version-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: #E2E8F0;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .vh-time { font-size: 10px; color: #94A3B8; }
+    .vh-author { font-size: 11px; font-weight: 700; color: #4ADE80; }
+    .vh-item.member-b .vh-author { color: #38BDF8; }
+    .vh-item.co-owned .vh-author { color: #C084FC; }
+    .vh-desc { font-size: 10.5px; color: #CBD5E1; line-height: 1.35; }
+  </style>
+</head>
+<body data-theme="scheme-b">
+
+  <!-- TOP FIGMA / CASE TOOL BAR -->
+  <header class="case-toolbar">
+    <div class="case-brand">
+      <span class="figma-badge">Figma Multi-Viewport Prototype</span>
+      <div>
+        <div class="case-title">Hartwell Primary School — Sustainable Travel System (S1–S9 | 2-Member Equal Split: 4.5 Screens Each)</div>
+        <div class="case-subtitle">Member A (Sofia Mironenko: S1–S4 + S5 Co-Lead) &amp; Member B (S5 Co-Lead + S6–S9) | Mobile App + PC Web + Classroom Smartboard</div>
+      </div>
+    </div>
+
+    <div class="toolbar-controls">
+      <!-- Viewport Switcher: Auto / Mobile / Desktop / Whiteboard -->
+      <div class="btn-group" title="Switch Viewport Form Factor">
+        <button id="vp-auto" class="tb-btn active-mode" onclick="setViewportMode('auto')">Auto Form-Factor</button>
+        <button id="vp-mobile" class="tb-btn" onclick="setViewportMode('mobile')">&#128241; Mobile App</button>
+        <button id="vp-desktop" class="tb-btn" onclick="setViewportMode('desktop')">&#128187; PC / Classroom Whiteboard</button>
+      </div>
+
+      <!-- Colour Scheme Switcher -->
+      <div class="btn-group">
+        <button id="btn-scheme-a" class="tb-btn" onclick="setScheme('scheme-a')">Scheme A: Navy (Rejected)</button>
+        <button id="btn-scheme-b" class="tb-btn active" onclick="setScheme('scheme-b')">Scheme B: Eco-Green (Selected)</button>
+      </div>
+
+      <button class="tb-btn" style="background:#334155; color:#fff; border-radius:6px;" onclick="toggleHistory()">Version History (2 Members)</button>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <!-- LEFT 9-SCREEN TRACEABILITY SIDEBAR (2-MEMBER 4.5 SCREEN SPLIT) -->
+    <aside class="sidebar">
+      <div class="sidebar-group-title">Member A: Sofia Mironenko (4.5 Screens)</div>
+      <button class="nav-item active" id="nav-s1" onclick="showScreen('s1')">
+        <div class="nav-item-top">
+          <span>S1: Unified OTP Login</span>
+          <div class="nav-badges">
+            <span class="nav-device-tag">Mobile/Web</span>
+            <span class="nav-req-badge">UC-01</span>
+          </div>
+        </div>
+        <div class="nav-item-sub">Sofia M. | REQ-SEC-01 Segmented Role &amp; OTP</div>
+      </button>
+
+      <button class="nav-item" id="nav-s2" onclick="showScreen('s2')">
+        <div class="nav-item-top">
+          <span>S2: 500m Hub Check-In</span>
+          <div class="nav-badges">
+            <span class="nav-device-tag">Mobile App</span>
+            <span class="nav-req-badge">UC-02</span>
+          </div>
+        </div>
+        <div class="nav-item-sub">Sofia M. | REQ-TRK-01 Date Picker &amp; 14/15</div>
+      </button>
+
+      <button class="nav-item" id="nav-s3" onclick="showScreen('s3')">
+        <div class="nav-item-top">
+          <span>S3: 9AM SOS &amp; Walk Report</span>
+          <div class="nav-badges">
+            <span class="nav-device-tag">Mobile/PC</span>
+            <span class="nav-req-badge">UC-03</span>
+          </div>
+        </div>
+        <div class="nav-item-sub">Sofia M. | REQ-SAF-02 2-Step SOS Modal</div>
+      </button>
+
+      <button class="nav-item" id="nav-s4" onclick="showScreen('s4')">
+        <div class="nav-item-top">
+          <span>S4: BOM &amp; VicRoads Feed</span>
+          <div class="nav-badges">
+            <span class="nav-device-tag">Mobile/Web</span>
+            <span class="nav-req-badge">UC-04</span>
+          </div>
+        </div>
+        <div class="nav-item-sub">Sofia M. | REQ-ENV-01 Live Weather &amp; Traffic</div>
+      </button>
+
+      <button class="nav-item" id="nav-s5" onclick="showScreen('s5')">
+        <div class="nav-item-top">
+          <span>S5: CR-01 Route Override</span>
+          <div class="nav-badges">
+            <span class="nav-device-tag">Shared 0.5/0.5</span>
+            <span class="nav-req-badge">UC-05</span>
+          </div>
+        </div>
+        <div class="nav-item-sub">Sofia M. + Member B | REQ-ENV-02 CR-01 Detour</div>
+      </button>
+
+      <div class="sidebar-group-title member-b-hdr">Member B: Partner (4.5 Screens)</div>
+      <button class="nav-item" id="nav-s6" onclick="showScreen('s6')">
+        <div class="nav-item-top">
+          <span>S6: Hub Roll Call &amp; KPIs</span>
+          <div class="nav-badges">
+            <span class="nav-device-tag">Admin PC</span>
+            <span class="nav-req-badge">UC-06</span>
+          </div>
+        </div>
+        <div class="nav-item-sub">Member B | REQ-TRK-03 39%&rarr;51% Gate KPIs</div>
+      </button>
+
+      <button class="nav-item" id="nav-s7" onclick="showScreen('s7')">
+        <div class="nav-item-top">
+          <span>S7: Parent Geofence Portal</span>
+          <div class="nav-badges">
+            <span class="nav-device-tag">Parent PC/App</span>
+            <span class="nav-req-badge">UC-07</span>
+          </div>
+        </div>
+        <div class="nav-item-sub">Member B | REQ-PAR-01 08:46 AM Arrival</div>
+      </button>
+
+      <button class="nav-item" id="nav-s8" onclick="showScreen('s8')">
+        <div class="nav-item-top">
+          <span>S8: Whiteboard Gamification</span>
+          <div class="nav-badges">
+            <span class="nav-device-tag">Smartboard</span>
+            <span class="nav-req-badge">UC-08</span>
+          </div>
+        </div>
+        <div class="nav-item-sub">Member B | REQ-ETH-01 Golden Boot &amp; APP 6</div>
+      </button>
+
+      <button class="nav-item" id="nav-s9" onclick="showScreen('s9')">
+        <div class="nav-item-top">
+          <span>S9: Council Export &amp; Access</span>
+          <div class="nav-badges">
+            <span class="nav-device-tag">Admin PC</span>
+            <span class="nav-req-badge">UC-09</span>
+          </div>
+        </div>
+        <div class="nav-item-sub">Member B | REQ-ACC-01 Locked PII &amp; WCAG</div>
+      </button>
+    </aside>
+
+    <!-- CENTER INTERACTIVE STAGE -->
+    <main class="stage">
+      <div class="device-mode-pill" id="form-factor-indicator">
+        <span>Active Persona Viewport:</span>
+        <span class="highlight" id="form-factor-text">Duty Assistant Roadside Mobile App (440px Handheld)</span>
+      </div>
+
+      <div class="device-frame" id="prototype-viewport">
+        <!-- Browser Bar (Appears automatically on Desktop / Classroom Smartboard screens S6, S7, S8, S9) -->
+        <div class="browser-chrome-bar">
+          <div class="window-dots">
+            <span class="w-dot r"></span>
+            <span class="w-dot y"></span>
+            <span class="w-dot g"></span>
+          </div>
+          <div class="browser-url-box">
+            <span id="browser-url-text">https://portal.hartwellps.vic.edu.au/whiteboard-leaderboard</span>
+            <span>&#128274; Verified School Intranet SSL</span>
+          </div>
+        </div>
+
+        <!-- Top Status Bar -->
+        <div class="device-statusbar">
+          <span id="statusbar-left">08:46 AM | Boroondara SafeNet</span>
+          <span class="sla-pill">SLA: 0.38s Live Cloud Sync</span>
+        </div>
+
+        <!-- App Header -->
+        <div class="app-header">
+          <div class="app-header-top">
+            <span class="school-title">Hartwell Primary School — Sustainable Travel System</span>
+            <span class="contrast-tag" id="contrast-indicator">11.4:1 WCAG AAA</span>
+          </div>
+          <div class="screen-subtitle-bar">
+            <span id="header-screen-title">S1: Unified Login &amp; Dynamic OTP</span>
+            <span id="header-owner-badge">Owner: Sofia M. (Member A) | UC-01</span>
+          </div>
+        </div>
+
+        <!-- Screen Body -->
+        <div class="screen-body">
+
+          <!-- ==================== SCREEN S1 ==================== -->
+          <div class="screen-pane active" id="pane-s1">
+            <div class="banner-success">
+              <span>Active Morning Window: 08:15 AM – 09:00 AM School Zone Supervision</span>
+              <span>Multi-Device SSO</span>
+            </div>
+
+            <div class="desktop-split">
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">1. Role-Based Persona Selector</span>
+                  <span class="req-pill">UC-01 | REQ-SEC-01</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>Select Authorised Persona Role (Mobile or Classroom PC)</span>
+                    <span class="control-type-hint">[Segmented Control]</span>
+                  </label>
+                  <div class="segmented-control">
+                    <button class="seg-btn" onclick="showScreen('s7')">Parent (PC/App)</button>
+                    <button class="seg-btn active">Duty Assistant (App)</button>
+                    <button class="seg-btn" onclick="showScreen('s8')">Teacher (Smartboard)</button>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>Staff / Carer Email Address</span>
+                    <span class="control-type-hint">[Pre-filled Input]</span>
+                  </label>
+                  <input type="text" class="input-box" value="s.mitchell@hartwellps.vic.edu.au" readonly />
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">2. Dynamic Morning Shift OTP</span>
+                  <span class="req-pill">REQ-SAF-01</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>6-Digit Time-Bound Shift Code (08:15–09:00 AM)</span>
+                    <span class="control-type-hint">[Numeric Mask]</span>
+                  </label>
+                  <div class="otp-row">
+                    <div class="otp-digit">4</div>
+                    <div class="otp-digit">8</div>
+                    <div class="otp-digit">2</div>
+                    <div class="otp-digit">-</div>
+                    <div class="otp-digit">9</div>
+                    <div class="otp-digit">1</div>
+                    <div class="otp-digit">0</div>
+                  </div>
+                </div>
+                <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 8px;">
+                  Matches <code>DutyRouteAssistant.dynamicOTP</code> — Expires automatically at 09:05 AM
+                </div>
+                <button class="btn-primary" onclick="showScreen('s2')">
+                  Verify Shift OTP &amp; Open 500m Hub Check-In &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== SCREEN S2 ==================== -->
+          <div class="screen-pane" id="pane-s2">
+            <div class="banner-success">
+              <span>Visibility of System Status (#1): Live Counter 14 / 15 Checked In</span>
+              <span>0.38s SLA</span>
+            </div>
+
+            <div class="desktop-split">
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">Walk Session &amp; 500m Hub Selector</span>
+                  <span class="req-pill">UC-02 | REQ-TRK-01</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>Walk Commute Date</span>
+                    <span class="control-type-hint">[Calendar Date Picker]</span>
+                  </label>
+                  <input type="date" class="input-box" value="2026-11-02" readonly />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>Assigned 500m Drop-Off Hub &amp; Walking Group</span>
+                    <span class="control-type-hint">[Constrained Dropdown]</span>
+                  </label>
+                  <select class="select-box">
+                    <option selected>Group G-04: Toorak Rd / Hartwell East 500m Hub (08:15 AM)</option>
+                    <option>Group G-02: Myrtle Park Greenway 500m Hub (08:20 AM)</option>
+                    <option>Group G-01: Fordham Gardens 500m Hub (08:15 AM)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">Live Telemetry &amp; Student Roll Call</span>
+                  <span class="req-pill">Non-Smartphone RFID/QR</span>
+                </div>
+                <div class="metrics-grid" style="margin-bottom: 10px;">
+                  <div class="metric-box">
+                    <div class="metric-val">1,840</div>
+                    <div class="metric-lbl">Group Steps</div>
+                  </div>
+                  <div class="metric-box">
+                    <div class="metric-val">1.35 km</div>
+                    <div class="metric-lbl">Distance</div>
+                  </div>
+                  <div class="metric-box">
+                    <div class="metric-val">14 / 15</div>
+                    <div class="metric-lbl">Checked In</div>
+                  </div>
+                </div>
+
+                <div class="roster-row">
+                  <span>1. Leo Mitchell (STU-1042, Yr 4B) — Bag Tag QR</span>
+                  <span class="status-pill-ok">08:22 AM Checked In</span>
+                </div>
+                <div class="roster-row">
+                  <span>2. Maya Chen (STU-1088, Yr 4B) — Bag Tag QR</span>
+                  <span class="status-pill-ok">08:23 AM Checked In</span>
+                </div>
+                <div class="roster-row">
+                  <span>15. Noah Patel (STU-1104, Yr 3A) — Unaccounted</span>
+                  <span class="status-pill-warn">Pending @ 08:59 AM</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <button class="btn-primary" onclick="showScreen('s3')">View 9AM Escalation &rarr;</button>
+              <button class="btn-danger-outline" onclick="showScreen('s3'); openModal();">End Walk / 9AM SOS</button>
+            </div>
+          </div>
+
+          <!-- ==================== SCREEN S3 ==================== -->
+          <div class="screen-pane" id="pane-s3">
+            <div class="banner-crimson">
+              9:00 AM Gate Cutoff Alert: 1 Student (Noah Patel, STU-1104) Unaccounted on Group G-04
+            </div>
+
+            <div class="desktop-split">
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">9:00 AM Escalation &amp; SOS Trigger</span>
+                  <span class="req-pill">UC-03 | REQ-SAF-02</span>
+                </div>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+                  Peer Review Fix (Member B &rarr; Sofia M.): Restyled destructive trigger in high-contrast crimson and added a mandatory 2-step confirmation modal to prevent false parent panic.
+                </p>
+                <button class="btn-danger-outline" onclick="openModal()">
+                  Trigger 9:00 AM Unaccounted Student SOS Alert &amp; End Walk
+                </button>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">Walk Summary &amp; Sustainability Report</span>
+                  <span class="req-pill">UC-03 | REQ-TRK-02</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>Report Date Range</span>
+                    <span class="control-type-hint">[Date Range Picker]</span>
+                  </label>
+                  <input type="text" class="input-box" value="01/10/2026 to 02/11/2026" readonly />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>Student Lookup Filter</span>
+                    <span class="control-type-hint">[Auto-Complete Search]</span>
+                  </label>
+                  <input type="text" class="input-box" value="Leo Mitchell (STU-1042, Year 4B)" readonly />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>Export Format</span>
+                    <span class="control-type-hint">[Radio Buttons]</span>
+                  </label>
+                  <div style="font-size: 12.5px; font-weight: 700; color: var(--primary);">
+                    (&bull;) PDF Official Summary &nbsp;&nbsp; ( ) CSV Dataset
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== SCREEN S4 ==================== -->
+          <div class="screen-pane" id="pane-s4">
+            <div class="banner-amber">
+              BOM Weather Squall Alert: Heavy Rain (80% Precip) &amp; Standing Water on Corridor C-01
+            </div>
+
+            <div class="desktop-split">
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">Live BOM &amp; VicRoads Corridor Feed</span>
+                  <span class="req-pill">UC-04 | REQ-ENV-01</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>Monitored School Walking Corridor</span>
+                    <span class="control-type-hint">[Corridor Dropdown]</span>
+                  </label>
+                  <select class="select-box">
+                    <option selected>Corridor C-01: Toorak Rd / Camberwell Rd Crossing</option>
+                    <option>Corridor C-02: Myrtle Park Greenway Path</option>
+                    <option>Corridor C-03: Fordham Rd Signalised Crossing</option>
+                  </select>
+                </div>
+
+                <div class="metrics-grid" style="margin: 10px 0;">
+                  <div class="metric-box">
+                    <div class="metric-val">16&deg;C</div>
+                    <div class="metric-lbl">BOM Temp</div>
+                  </div>
+                  <div class="metric-box">
+                    <div class="metric-val" style="color: #B91C1C;">80% Rain</div>
+                    <div class="metric-lbl">Squall Risk</div>
+                  </div>
+                  <div class="metric-box">
+                    <div class="metric-val" style="color: #D97706;">Blocked</div>
+                    <div class="metric-lbl">VicRoads Status</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">Severity &amp; Action Dispatch</span>
+                  <span class="req-pill">Real-Time Telemetry</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>Hazard Severity Classification</span>
+                    <span class="control-type-hint">[Segmented Control]</span>
+                  </label>
+                  <div class="segmented-control">
+                    <button class="seg-btn">Normal</button>
+                    <button class="seg-btn">Caution</button>
+                    <button class="seg-btn active">Severe Detour</button>
+                  </div>
+                </div>
+                <button class="btn-primary" style="margin-top:8px;" onclick="showScreen('s5')">
+                  Open Client Change CR-01 Alternate Hub Override (S5) &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== SCREEN S5 (CR-01 — CO-OWNED 0.5 / 0.5) ==================== -->
+          <div class="screen-pane" id="pane-s5">
+            <div class="banner-amber">
+              CLIENT CHANGE REQUEST CR-01: Corridor C-01 Blocked — Select Pre-Vetted Safe Detour
+            </div>
+
+            <div class="desktop-split">
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">Constrained Alternate Route &amp; 500m Hub</span>
+                  <span class="req-pill">UC-05 | REQ-ENV-02 (CR-01)</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>Verified Alternate 500m Hub &amp; Corridor</span>
+                    <span class="control-type-hint">[Constrained Dropdown — Peer Fix by Sofia M.]</span>
+                  </label>
+                  <select class="select-box">
+                    <option selected>Route B: Myrtle Park Greenway 500m Hub (+4 mins | Sheltered)</option>
+                    <option>Route C: Fordham Gardens Signalised Path (+6 mins)</option>
+                    <option>Hold at Primary Shelter Hub H-01 (Wait 10 mins)</option>
+                  </select>
+                </div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">
+                  Replaces error-prone free-text street input identified during Sofia M.'s Peer Usability Walkthrough.
+                </div>
+
+                <div class="toggle-row">
+                  <div>
+                    <div style="font-size: 12px; font-weight: 700;">1:1 Mobility &amp; Vision Support Check</div>
+                    <div style="font-size: 10.5px; color: var(--text-muted);">Verify accessible kerb ramps on Myrtle Park detour</div>
+                  </div>
+                  <span class="toggle-pill">[CONFIRMED 1:1]</span>
+                </div>
+
+                <div class="toggle-row">
+                  <div>
+                    <div style="font-size: 12px; font-weight: 700;">Broadcast Instant CR-01 Detour Alert</div>
+                    <div style="font-size: 10.5px; color: var(--text-muted);">Push live ETA (+4 mins) to enrolled parents on S7</div>
+                  </div>
+                  <span class="toggle-pill">[ON — AUTO PUSH]</span>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">Detour Safety Verification (Shared 0.5/0.5 Bridge)</span>
+                  <span class="req-pill">Zero Road Crossing Risk</span>
+                </div>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+                  Co-integrated by Sofia M. (S4 Hazard Trigger &amp; Constrained Dropdown Fix) and Member B (S7 Parent Broadcast Link).
+                </p>
+                <button class="btn-primary" onclick="showScreen('s6')">
+                  Activate Route B Detour &amp; Proceed to Hub Roll Call (S6) &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== SCREEN S6 (ADMIN/TEACHER TABLET & PC) ==================== -->
+          <div class="screen-pane" id="pane-s6">
+            <div class="banner-success">
+              <span>12/12 Students Checked In at 08:47 AM — Myrtle Park 500m Radial Drop-Off Zone</span>
+              <span>Teacher / Admin Dashboard</span>
+            </div>
+
+            <div class="desktop-split">
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">500m Hub Roll Call Verification</span>
+                  <span class="req-pill">UC-06 | REQ-TRK-03</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>Active Drop-Off Hub</span>
+                    <span class="control-type-hint">[Constrained Dropdown]</span>
+                  </label>
+                  <select class="select-box">
+                    <option selected>Hub H-02: Myrtle Park 500m Radial Drop-Off Zone</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>Gate Arrival Check-In Timestamp</span>
+                    <span class="control-type-hint">[Auto-Filled Time Picker]</span>
+                  </label>
+                  <input type="text" class="input-box" value="08:47 AM (Verified via School Gate RFID/QR Beacon)" readonly />
+                </div>
+                <div class="roster-row">
+                  <span>Group G-02 Roster (12/12 Checked In)</span>
+                  <span class="status-pill-ok">100% Arrived Safe</span>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">School Gate Congestion &amp; Walking KPIs</span>
+                  <span class="req-pill">Victoria Walks Target</span>
+                </div>
+                <div style="font-size: 12px; font-weight: 700; margin-bottom: 4px;">
+                  Active Walking Mode Share: 39% Baseline &rarr; <span style="color: var(--primary);">48.5% Current (Target: 51%)</span>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill" style="width: 88%;"></div>
+                </div>
+                <div class="metrics-grid" style="margin-top: 10px;">
+                  <div class="metric-box">
+                    <div class="metric-val">-34%</div>
+                    <div class="metric-lbl">Gate Cars</div>
+                  </div>
+                  <div class="metric-box">
+                    <div class="metric-val">142 kg</div>
+                    <div class="metric-lbl">CO2 Saved</div>
+                  </div>
+                  <div class="metric-box">
+                    <div class="metric-val">100%</div>
+                    <div class="metric-lbl">Arrived Safe</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== SCREEN S7 (PARENT WEB PORTAL / MOBILE APP) ==================== -->
+          <div class="screen-pane" id="pane-s7">
+            <div class="banner-success">
+              <span>08:46 AM Safe Arrival Banner: Leo Mitchell Checked In at School Gate</span>
+              <span>Parent Desktop Web &amp; Mobile Portal</span>
+            </div>
+
+            <div class="desktop-split">
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">Parental Live Geofence &amp; Sibling Portal</span>
+                  <span class="req-pill">UC-07 | REQ-PAR-01</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>Enrolled Child Selector (1..* Multiplicity)</span>
+                    <span class="control-type-hint">[Sibling Dropdown]</span>
+                  </label>
+                  <select class="select-box">
+                    <option selected>Leo Mitchell (Year 4B) — Active on Route B Detour</option>
+                    <option>Sophie Mitchell (Year 1A) — Arrived Gate 2 (08:44 AM)</option>
+                  </select>
+                </div>
+
+                <div class="map-box">
+                  <div class="map-corridor-line"></div>
+                  <span class="map-pin">Inside 500m Safe Corridor — Myrtle Park Greenway</span>
+                  <div style="background: rgba(255,255,255,0.94); padding: 6px 9px; border-radius: 6px; font-size: 11px; font-weight: 700; color: #111827; z-index: 2;">
+                    CR-01 Detour Active: Diverted from Toorak Rd Squall (+4 mins)
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">Guardian Verification &amp; Quick Actions</span>
+                  <span class="req-pill">Zero Child Phone Needed</span>
+                </div>
+                <div class="roster-row">
+                  <span>Gate Beacon Check-In:</span>
+                  <span class="status-pill-ok">Verified 08:46 AM</span>
+                </div>
+                <div class="roster-row">
+                  <span>SMS Fallback Notification:</span>
+                  <span class="status-pill-ok">Sent to 0412 *** 890</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
+                  <button class="btn-primary" onclick="showScreen('s8')">View Classroom Leaderboard (S8)</button>
+                  <button class="btn-primary" style="background: var(--secondary);">Call Duty Assistant</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== SCREEN S8 (CLASSROOM SMARTBOARD GAMIFICATION + PRIVACY) ==================== -->
+          <div class="screen-pane" id="pane-s8">
+            <!-- Teacher Classroom Smartboard / Whiteboard Banner -->
+            <div class="whiteboard-hero">
+              <div>
+                <div style="font-size: 10.5px; font-weight: 800; color: #FDE047; text-transform: uppercase; letter-spacing: 0.5px;">
+                  &#128187; Classroom Interactive Whiteboard Mode (Projected by Teacher in Homeroom)
+                </div>
+                <div style="font-size: 16px; font-weight: 900; margin-top: 2px;">
+                  &#127942; Walking Wednesday &amp; Golden Boot Trophy Leaderboard
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 18px; font-weight: 900; color: #FDE047;">Term 4 — Week 5</div>
+                <div style="font-size: 10.5px; opacity: 0.9;">Zero Individual Student GPS Shown on Board</div>
+              </div>
+            </div>
+
+            <div class="desktop-split">
+              <!-- Left Column: Classroom Whiteboard Gamification Podium & Badges -->
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">Homeroom Active Travel Podium (Classroom Smartboard)</span>
+                  <span class="req-pill">Gamification &amp; Engagement</span>
+                </div>
+
+                <div class="trophy-podium-grid">
+                  <div class="podium-card first-place">
+                    <div class="podium-medal">&#129351; &#128095;</div>
+                    <div class="podium-class">1st: Year 4B</div>
+                    <div class="podium-rate">86% Walked</div>
+                    <div class="podium-sub">Ms. Lin | Golden Boot Winner!</div>
+                  </div>
+                  <div class="podium-card">
+                    <div class="podium-medal">&#129352;</div>
+                    <div class="podium-class">2nd: Year 5A</div>
+                    <div class="podium-rate">79% Walked</div>
+                    <div class="podium-sub">Mr. Davis | 24/30 Students</div>
+                  </div>
+                  <div class="podium-card">
+                    <div class="podium-medal">&#129353;</div>
+                    <div class="podium-class">3rd: Year 3B</div>
+                    <div class="podium-rate">74% Walked</div>
+                    <div class="podium-sub">Ms. Carter | 20/27 Students</div>
+                  </div>
+                </div>
+
+                <div style="font-size: 11px; font-weight: 800; color: var(--primary); margin-top: 10px;">
+                  Unlocked Class Sustainability Milestones (Projected for Students):
+                </div>
+                <div class="badges-strip">
+                  <div class="eco-badge-card">
+                    <span class="eco-badge-icon">&#127795;</span>
+                    <div class="eco-badge-info">142 kg CO2 Saved<br/><span style="font-weight:500;">= 7 Trees Planted</span></div>
+                  </div>
+                  <div class="eco-badge-card">
+                    <span class="eco-badge-icon">&#9928;</span>
+                    <div class="eco-badge-info">Storm Trooper Badge<br/><span style="font-weight:500;">Myrtle Park Detour</span></div>
+                  </div>
+                  <div class="eco-badge-card">
+                    <span class="eco-badge-icon">&#11088;</span>
+                    <div class="eco-badge-info">5-Week Streak<br/><span style="font-weight:500;">House Points +250</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Column: Technoethical Privacy & GPS Consent Manager (UC-08) -->
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">Time-Bounded Location Privacy Manager</span>
+                  <span class="req-pill">UC-08 | REQ-ETH-01 (APP 1/6)</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>Permitted Telemetry Tracking Window</span>
+                    <span class="control-type-hint">[Constrained Schedule — Peer Fix by Sofia M.]</span>
+                  </label>
+                  <select class="select-box">
+                    <option selected>Active ONLY 08:00–09:00 AM &amp; 03:15–04:15 PM (School Commute)</option>
+                    <option>Gate Check-In Beacon Only (Zero En-Route GPS)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>Raw Telemetry Auto-Purge Policy</span>
+                    <span class="control-type-hint">[Retention Dropdown]</span>
+                  </label>
+                  <select class="select-box">
+                    <option selected>Purge Raw GPS Logs Every 7 Days (APP 6 Minimisation)</option>
+                  </select>
+                </div>
+                <div class="toggle-row">
+                  <div>
+                    <div style="font-size: 11.5px; font-weight: 700;">Whiteboard Anonymization Guard</div>
+                    <div style="font-size: 10px; color: var(--text-muted);">Show class % totals only on classroom smartboard</div>
+                  </div>
+                  <span class="toggle-pill locked">[CLASS % ONLY]</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== SCREEN S9 (ADMIN PC COUNCIL EXPORT & ACCESSIBILITY) ==================== -->
+          <div class="screen-pane" id="pane-s9">
+            <div class="banner-success">
+              <span>Preferences Updated Successfully — Boroondara Council Dataset Anonymized</span>
+              <span>Admin &amp; Parent Web Portal</span>
+            </div>
+
+            <div class="desktop-split">
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">Council Dataset Export &amp; Locked PII Guard</span>
+                  <span class="req-pill">UC-09 | APP 6 Ethics</span>
+                </div>
+                <div class="toggle-row">
+                  <div>
+                    <div style="font-size: 12px; font-weight: 700;">Mandatory PII Anonymization (Strip Names/IDs)</div>
+                    <div style="font-size: 10.5px; color: var(--text-muted);">Peer Review Fix (Sofia M. &rarr; Member B): Locked ON to prevent APP 6 breach</div>
+                  </div>
+                  <span class="toggle-pill locked">[LOCKED ON — APP 6]</span>
+                </div>
+                <div class="toggle-row">
+                  <div>
+                    <div style="font-size: 12px; font-weight: 700;">Statutory Archive Retention Rule</div>
+                    <div style="font-size: 10.5px; color: var(--text-muted);">Aggregated non-identifiable count archive</div>
+                  </div>
+                  <span class="toggle-pill">7-Year Archive</span>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">WCAG 2.2 AAA Accessibility &amp; SMS Parity</span>
+                  <span class="req-pill">UC-09 | REQ-ACC-01</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>Interface Typography Scaling Slider</span>
+                    <span class="control-type-hint">[100% — 125% — 150%]</span>
+                  </label>
+                  <div class="segmented-control">
+                    <button class="seg-btn">100% Default</button>
+                    <button class="seg-btn active">125% Large (Active)</button>
+                    <button class="seg-btn">150% Extra High</button>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>Multi-Channel Alert Equity (No-Smartphone Parity)</span>
+                    <span class="control-type-hint">[Checkboxes]</span>
+                  </label>
+                  <div style="font-size: 12px; font-weight: 700; color: var(--primary);">
+                    [x] App Push &nbsp;&nbsp; [x] Two-Way SMS (No-App Parity) &nbsp;&nbsp; [ ] Email
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ==================== TWO-STEP CONFIRMATION MODAL (ERROR PREVENTION #5) ==================== -->
+        <div class="modal-backdrop" id="sos-modal">
+          <div class="modal-card">
+            <span class="modal-badge">Nielsen Heuristic #5: Error Prevention</span>
+            <div class="modal-title">Confirm 9:00 AM Absence SOS &amp; Walk Termination?</div>
+            <div class="modal-desc">
+              You are about to dispatch an immediate <strong>9:00 AM Unaccounted Student SMS Alert</strong> for <strong>Noah Patel (STU-1104)</strong> to Guardians &amp; School Admin and close Group G-04 roll call.<br/><br/>
+              <em>Added following Member B's Peer Usability Test on Sofia M.'s screen to prevent single-tap accidental parent panic in wet roadside conditions.</em>
+            </div>
+            <div class="modal-actions">
+              <button class="btn-cancel" onclick="closeModal()">Cancel (Keep Walk Active)</button>
+              <button class="btn-confirm-sos" onclick="closeModal()">Confirm &amp; Dispatch 9AM SMS</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Persistent 5-Tab Bottom Navigation Bar -->
+        <nav class="bottom-nav">
+          <button class="tab-btn active" id="tab-home" onclick="showScreen('s1')">
+            <span>&#128274;</span>
+            <span>S1–S3 Track</span>
+          </button>
+          <button class="tab-btn" id="tab-weather" onclick="showScreen('s4')">
+            <span>&#9928;</span>
+            <span>S4 Weather</span>
+          </button>
+          <button class="tab-btn" id="tab-reroute" onclick="showScreen('s5')">
+            <span>&#9888;</span>
+            <span>S5 CR-01</span>
+          </button>
+          <button class="tab-btn" id="tab-parent" onclick="showScreen('s7')">
+            <span>&#128205;</span>
+            <span>S7 Parent PC/App</span>
+          </button>
+          <button class="tab-btn" id="tab-privacy" onclick="showScreen('s8')">
+            <span>&#127942;</span>
+            <span>S8–S9 Whiteboard</span>
+          </button>
+        </nav>
+      </div>
+    </main>
+
+    <!-- RIGHT DRAWER: FIGMA VERSION HISTORY & ATTRIBUTION (2 MEMBERS EQUAL: 4.5 SCREENS EACH) -->
+    <aside class="version-history-drawer open" id="history-drawer">
+      <div class="vh-header">
+        <span class="vh-title">Figma Version History &amp; Attribution</span>
+        <span style="font-size: 11px; color: #4ADE80; font-weight: 700;">2 Members Equal (4.5/4.5)</span>
+      </div>
+
+      <div class="vh-item">
+        <div class="vh-version-tag">
+          <span>v2.4 — Peer Review Fixes &amp; S1–S4</span>
+          <span class="vh-time">06 Nov, 18:40</span>
+        </div>
+        <div class="vh-author">Sofia Mironenko (Member A — S1, S2, S3, S4 + 0.5 S5)</div>
+        <div class="vh-desc">Implemented 2-step SOS confirmation modal on S3/S2 (after Member B's peer test) &amp; replaced free-text detour with constrained 500m Hub dropdown on S5.</div>
+      </div>
+
+      <div class="vh-item member-b">
+        <div class="vh-version-tag">
+          <span>v2.3 — Smartboard S8, S6–S9 &amp; CR-01</span>
+          <span class="vh-time">06 Nov, 16:15</span>
+        </div>
+        <div class="vh-author">Member B (Partner — 0.5 S5 + S6, S7, S8, S9)</div>
+        <div class="vh-desc">Built S6 Hub Roll Call &amp; KPIs, S7 Parent Geofence Portal, S8 Classroom Smartboard Golden Boot Leaderboard + 08:00–09:00 AM GPS window, and S9 Locked PII toggle.</div>
+      </div>
+
+      <div class="vh-item co-owned">
+        <div class="vh-version-tag">
+          <span>v2.2 — Client Change Request CR-01 (S5)</span>
+          <span class="vh-time">05 Nov, 20:10</span>
+        </div>
+        <div class="vh-author">Sofia Mironenko + Member B (Co-Owned S5 Bridge)</div>
+        <div class="vh-desc">Connected Sofia M.'s S4 BOM Weather Squall trigger to S5 Myrtle Park Greenway 500m Hub override and Member B's S7 Live Parent Map alert.</div>
+      </div>
+
+      <div class="vh-item">
+        <div class="vh-version-tag">
+          <span>v2.0 — Client Colour Scheme B Swap</span>
+          <span class="vh-time">04 Nov, 14:30</span>
+        </div>
+        <div class="vh-author">Sofia Mironenko + Member B (Client: Akrati Jain)</div>
+        <div class="vh-desc">Swapped global design tokens from Scheme A (#1E3A8A Navy) to Client-Selected Scheme B (#1B5E20 Eco-Safe Green, 11.4:1 AAA) across all 9 screens in &lt;10s.</div>
+      </div>
+
+      <div class="vh-item member-b">
+        <div class="vh-version-tag">
+          <span>v1.0 — Initial SRS Baseline (4.5 Screens Each)</span>
+          <span class="vh-time">02 Nov, 11:00</span>
+        </div>
+        <div class="vh-author">Sofia Mironenko (4.5) &amp; Member B (4.5)</div>
+        <div class="vh-desc">Established shared Auto-Layout master navigation bar and equal 2-member attribution across UC-01 through UC-09.</div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    let currentViewportMode = 'auto'; // 'auto', 'mobile', 'desktop'
+    let currentScreenId = 's1';
+
+    const screenMeta = {
+      s1: {
+        title: "S1: Unified Login & Dynamic OTP",
+        owner: "Owner: Sofia M. (Member A) | UC-01",
+        defaultDesktop: false,
+        personaLabel: "Duty Assistant Roadside Mobile App / Staff SSO (440px Handheld)",
+        url: "https://portal.hartwellps.vic.edu.au/auth/login"
+      },
+      s2: {
+        title: "S2: 500m Hub Check-In & Walk Tracker",
+        owner: "Owner: Sofia M. (Member A) | UC-02",
+        defaultDesktop: false,
+        personaLabel: "Duty Assistant Roadside Mobile App (440px Outdoor Handheld)",
+        url: "https://portal.hartwellps.vic.edu.au/duty/hub-checkin"
+      },
+      s3: {
+        title: "S3: 9:00 AM SOS Alert & Walk Summary",
+        owner: "Owner: Sofia M. (Member A) | UC-03",
+        defaultDesktop: false,
+        personaLabel: "Duty Assistant Mobile App & Teacher PDF Export (440px / Web)",
+        url: "https://portal.hartwellps.vic.edu.au/duty/sos-escalation"
+      },
+      s4: {
+        title: "S4: Live BOM Weather & Traffic Feed",
+        owner: "Owner: Sofia M. (Member A) | UC-04",
+        defaultDesktop: false,
+        personaLabel: "Duty Assistant Roadside Weather Monitor (440px Outdoor Handheld)",
+        url: "https://portal.hartwellps.vic.edu.au/hazard/bom-feed"
+      },
+      s5: {
+        title: "S5: Alternate Route Selector (CR-01)",
+        owner: "Co-Owners: Sofia M. (0.5) & Member B (0.5) | UC-05",
+        defaultDesktop: false,
+        personaLabel: "Duty Assistant & Admin CR-01 Detour Override (440px Handheld)",
+        url: "https://portal.hartwellps.vic.edu.au/hazard/cr01-override"
+      },
+      s6: {
+        title: "S6: Hub Roll Call & Congestion KPIs",
+        owner: "Owner: Member B | UC-06",
+        defaultDesktop: true,
+        personaLabel: "School Admin & Teacher Computer Dashboard (Wide Desktop Browser)",
+        url: "https://portal.hartwellps.vic.edu.au/admin/rollcall-kpis"
+      },
+      s7: {
+        title: "S7: Parental Live Geofence Portal",
+        owner: "Owner: Member B | UC-07",
+        defaultDesktop: true,
+        personaLabel: "Parent Work Computer Web Portal & Mobile App (Responsive Desktop/App)",
+        url: "https://portal.hartwellps.vic.edu.au/parent/live-geofence"
+      },
+      s8: {
+        title: "S8: Classroom Smartboard Leaderboard & Privacy",
+        owner: "Owner: Member B | UC-08",
+        defaultDesktop: true,
+        personaLabel: "Teacher Classroom Smartboard / Interactive Whiteboard + Parent Privacy",
+        url: "https://portal.hartwellps.vic.edu.au/classroom/walking-wednesday-whiteboard"
+      },
+      s9: {
+        title: "S9: Council Export & Accessibility",
+        owner: "Owner: Member B | UC-09",
+        defaultDesktop: true,
+        personaLabel: "School Admin Computer — Boroondara Council Export & WCAG Settings",
+        url: "https://portal.hartwellps.vic.edu.au/admin/council-export"
+      }
+    };
+
+    function applyViewportSize(screenId) {
+      const frame = document.getElementById('prototype-viewport');
+      const ffText = document.getElementById('form-factor-text');
+      const urlText = document.getElementById('browser-url-text');
+      const meta = screenMeta[screenId] || screenMeta.s1;
+
+      urlText.textContent = meta.url;
+
+      let useDesktop = false;
+      if (currentViewportMode === 'desktop') {
+        useDesktop = true;
+      } else if (currentViewportMode === 'mobile') {
+        useDesktop = false;
+      } else {
+        useDesktop = meta.defaultDesktop;
+      }
+
+      if (useDesktop) {
+        frame.classList.add('desktop-frame');
+        ffText.textContent = meta.personaLabel + " [Wide Desktop / Smartboard View]";
+      } else {
+        frame.classList.remove('desktop-frame');
+        ffText.textContent = meta.personaLabel + " [Mobile Handheld View]";
+      }
+    }
+
+    function setViewportMode(mode) {
+      currentViewportMode = mode;
+      document.getElementById('vp-auto').classList.toggle('active-mode', mode === 'auto');
+      document.getElementById('vp-mobile').classList.toggle('active-mode', mode === 'mobile');
+      document.getElementById('vp-desktop').classList.toggle('active-mode', mode === 'desktop');
+      applyViewportSize(currentScreenId);
+    }
+
+    function showScreen(screenId) {
+      currentScreenId = screenId;
+      document.querySelectorAll('.screen-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const pane = document.getElementById('pane-' + screenId);
+      const nav = document.getElementById('nav-' + screenId);
+      if (pane) pane.classList.add('active');
+      if (nav) nav.classList.add('active');
+
+      if (screenMeta[screenId]) {
+        document.getElementById('header-screen-title').textContent = screenMeta[screenId].title;
+        document.getElementById('header-owner-badge').textContent = screenMeta[screenId].owner;
+      }
+      applyViewportSize(screenId);
+      closeModal();
+    }
+
+    function setScheme(scheme) {
+      document.body.setAttribute('data-theme', scheme);
+      const btnA = document.getElementById('btn-scheme-a');
+      const btnB = document.getElementById('btn-scheme-b');
+      const contrast = document.getElementById('contrast-indicator');
+      if (scheme === 'scheme-a') {
+        btnA.classList.add('active-navy');
+        btnB.classList.remove('active');
+        contrast.textContent = '7.2:1 Contrast (Scheme A)';
+      } else {
+        btnB.classList.add('active');
+        btnA.classList.remove('active-navy');
+        contrast.textContent = '11.4:1 WCAG AAA (Scheme B)';
+      }
+    }
+
+    function openModal() {
+      document.getElementById('sos-modal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('sos-modal').classList.remove('open');
+    }
+
+    function toggleHistory() {
+      document.getElementById('history-drawer').classList.toggle('open');
+    }
+
+    // Support URL query params for automated screenshot rendering: ?screen=s8&scheme=scheme-b&vp=desktop&modal=1
+    window.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const screen = params.get('screen');
+      const scheme = params.get('scheme');
+      const vp = params.get('vp');
+      const modal = params.get('modal');
+      if (scheme) setScheme(scheme);
+      if (vp) setViewportMode(vp);
+      if (screen) showScreen(screen);
+      if (modal === '1') openModal();
+    });
+  </script>
+</body>
+</html>
