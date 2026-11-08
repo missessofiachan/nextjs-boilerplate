@@ -85,7 +85,7 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
   const [showPass1, setShowPass1] = useState(false);
   const [showPass2, setShowPass2] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
-  const [shiftOtp, setShiftOtp] = useState('849-201');
+  const [shiftOtp, setShiftOtp] = useState('482-910');
 
   const loginWithDemo = (account: DemoAccount, immediate = false) => {
     const form = formRef.current;
@@ -905,7 +905,7 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
                       borderRadius: '999px',
                     }}
                   >
-                    Active Shift Window: 08:00–09:15 AM
+                    Active Shift Window: 08:15–09:00 AM
                   </span>
                 </div>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -930,7 +930,7 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
                     maxLength={7}
                   />
                   <div style={{ fontSize: '11px', color: '#647069', flex: 1, lineHeight: 1.35 }}>
-                    Matches <code>DutyRouteAssistant.dynamicOTP</code> &bull; GPS auto-terminates at 09:15 AM
+                    Matches <code>DutyRouteAssistant.dynamicOTP</code> &bull; GPS auto-terminates at 09:05 AM
                   </div>
                 </div>
               </div>

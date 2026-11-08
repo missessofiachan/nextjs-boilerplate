@@ -339,7 +339,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
               Hartwell Primary School — Sustainable Travel System <span className="case-motto">• “Strive for the Highest”</span> (S1–S9 | 2-Member Equal Split: 4.5 Screens Each)
             </div>
             <div className="case-subtitle">
-              Member A (Sofia Mironenko: S1–S4 + S5 Co-Lead) &amp; Member B (Kim Le: S5 Co-Lead + S6–S9) | Real Site + Figma Prototype
+              Sofia Mironenko (S1–S4 + 0.5 S5) &amp; Kim Le (0.5 S5 + S6–S9) | Real Site + Figma Prototype
             </div>
           </div>
         </div>
@@ -454,6 +454,26 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
             {showRubricTags ? '🏷️ Rubric Codes: ON' : '🏷️ Rubric Codes: OFF'}
           </button>
 
+          {/* Always-Accessible Top-Right Colour Scheme Switcher (Report §5.1 Step 3: <10s Swap) */}
+          <div className="btn-group" title="Verify <10s Global Colour Token Swap (Scheme A vs Scheme B)">
+            <button
+              id="btn-scheme-a"
+              type="button"
+              className={`tb-btn ${scheme === 'scheme-a' ? 'active-navy' : ''}`}
+              onClick={() => setScheme('scheme-a')}
+            >
+              Scheme A: Municipal Navy
+            </button>
+            <button
+              id="btn-scheme-b"
+              type="button"
+              className={`tb-btn ${scheme === 'scheme-b' ? 'active' : ''}`}
+              onClick={() => setScheme('scheme-b')}
+            >
+              Scheme B: Eco-Safe Green
+            </button>
+          </div>
+
           {/* Viewport Switcher: Auto / Mobile / Desktop / Whiteboard (shown in Figma Canvas mode) */}
           {viewMode === 'figma-canvas' && (
             <>
@@ -484,33 +504,13 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                 </button>
               </div>
 
-              {/* Colour Scheme Switcher */}
-              <div className="btn-group">
-                <button
-                  id="btn-scheme-a"
-                  type="button"
-                  className={`tb-btn ${scheme === 'scheme-a' ? 'active-navy' : ''}`}
-                  onClick={() => setScheme('scheme-a')}
-                >
-                  Scheme A: Navy (Rejected)
-                </button>
-                <button
-                  id="btn-scheme-b"
-                  type="button"
-                  className={`tb-btn ${scheme === 'scheme-b' ? 'active' : ''}`}
-                  onClick={() => setScheme('scheme-b')}
-                >
-                  Scheme B: Eco-Green (Selected)
-                </button>
-              </div>
-
               <button
                 type="button"
                 className="tb-btn"
                 style={{ background: '#334155', color: '#fff', borderRadius: '6px' }}
                 onClick={() => setHistoryOpen((prev) => !prev)}
               >
-                Version History (2 Members)
+                Version History (Sofia &amp; Kim)
               </button>
             </>
           )}
@@ -520,7 +520,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
       <div className="workspace">
         {/* LEFT 9-SCREEN TRACEABILITY SIDEBAR (2-MEMBER 4.5 SCREEN SPLIT) */}
         <aside className="sidebar">
-          <div className="sidebar-group-title">Member A: Sofia Mironenko (4.5 Screens)</div>
+          <div className="sidebar-group-title">Sofia Mironenko (4.5 Screens)</div>
           {memberAScreens.map((id) => {
             const item = SCREEN_META[id];
             const isActive = currentScreenId === id;
@@ -547,7 +547,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
             );
           })}
 
-          <div className="sidebar-group-title member-b-hdr">Member B: Kim Le (4.5 Screens)</div>
+          <div className="sidebar-group-title member-b-hdr">Kim Le (4.5 Screens)</div>
           {memberBScreens.map((id) => {
             const item = SCREEN_META[id];
             const isActive = currentScreenId === id;
@@ -1370,14 +1370,28 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                       style={{
                         fontSize: '12px',
                         color: 'var(--text-muted)',
-                        marginBottom: '10px',
+                        marginBottom: '8px',
                       }}
                     >
                       <span className="academic-annotation">
-                        Peer Review Fix (Member B &rarr; Sofia M.):{' '}
+                        Peer Review Fix (Kim Le &rarr; Sofia M.):{' '}
                       </span>
                       High-priority emergency escalation requiring two-step confirmation before SMS broadcast.
                     </p>
+                    <div
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        color: '#15803d',
+                        background: 'rgba(22, 163, 74, 0.08)',
+                        border: '1px solid rgba(22, 163, 74, 0.25)',
+                        borderRadius: '6px',
+                        padding: '5px 8px',
+                        marginBottom: '10px',
+                      }}
+                    >
+                      ⏱️ 3-Min Grace Check Verified (08:57–09:00 AM) &bull; Offline Local Cache Synced
+                    </div>
 
                     {/* Pre-Checked Emergency Escalation Delivery Channels */}
                     <div
@@ -1715,7 +1729,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                       }}
                     >
                       Co-integrated by Sofia M. (S4 Hazard Trigger &amp; Constrained Dropdown Fix)
-                      and Member B (S7 Parent Broadcast Link).
+                      and Kim Le (S7 Parent Broadcast Link).
                     </p>
                     <div className="map-view-header">
                       <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--primary)' }}>
@@ -2455,7 +2469,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                         </div>
                         <div style={{ fontSize: '10.5px', color: 'var(--text-muted)' }}>
                           <span className="academic-annotation">
-                            Peer Review Fix (Sofia M. &rarr; Member B):{' '}
+                            Peer Review Fix (Sofia M. &rarr; Kim Le):{' '}
                           </span>
                           Locked ON to comply with Australian Privacy Principle (APP 6) data minimisation.
                         </div>
@@ -2627,7 +2641,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                   <br />
                   <br />
                   <em>
-                    Added following Member B&apos;s Peer Usability Test on Sofia M.&apos;s screen
+                    Added following Kim Le&apos;s Peer Usability Test on Sofia M.&apos;s screen
                     to prevent single-tap accidental parent panic in wet roadside conditions.
                   </em>
                 </div>
@@ -3253,10 +3267,10 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
               <span className="vh-time">06 Nov, 18:40</span>
             </div>
             <div className="vh-author">
-              Sofia Mironenko (Member A — S1, S2, S3, S4 + 0.5 S5)
+              Sofia Mironenko (S1, S2, S3, S4 + 0.5 S5)
             </div>
             <div className="vh-desc">
-              Implemented 2-step SOS confirmation modal on S3/S2 (after Member B&apos;s peer test)
+              Implemented 2-step SOS confirmation modal on S3/S2 (after Kim Le&apos;s peer test)
               &amp; replaced free-text detour with constrained 500m Hub dropdown on S5.
             </div>
           </div>
@@ -3266,7 +3280,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
               <span>v2.3 — Smartboard S8, S6–S9 &amp; CR-01</span>
               <span className="vh-time">06 Nov, 16:15</span>
             </div>
-            <div className="vh-author">Kim Le (Partner — 0.5 S5 + S6, S7, S8, S9)</div>
+            <div className="vh-author">Kim Le (0.5 S5 + S6, S7, S8, S9)</div>
             <div className="vh-desc">
               Built S6 Hub Roll Call &amp; KPIs, S7 Parent Geofence Portal, S8 Classroom
               Smartboard Golden Boot Leaderboard + 08:00–09:00 AM GPS window, and S9 Locked PII
@@ -3282,7 +3296,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
             <div className="vh-author">Sofia Mironenko + Kim Le (Co-Owned S5 Bridge)</div>
             <div className="vh-desc">
               Connected Sofia M.&apos;s S4 BOM Weather Squall trigger to S5 Myrtle Park Greenway
-              500m Hub override and Member B&apos;s S7 Live Parent Map alert.
+              500m Hub override and Kim Le&apos;s S7 Live Parent Map alert.
             </div>
           </div>
 
