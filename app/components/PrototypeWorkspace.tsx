@@ -14,6 +14,18 @@ import {
   isValidScreenId,
 } from '../data/prototype-data';
 
+const REAL_SITE_TITLES: Record<ScreenId, string> = {
+  s1: 'Morning Sign In',
+  s2: '500m Hub Check-In',
+  s3: 'Attendance & Alerts',
+  s4: 'Weather & Corridors',
+  s5: 'Safe Detour Routing',
+  s6: 'Hub Roll Call & KPIs',
+  s7: 'Live Family Geofence',
+  s8: 'Walking Trophy Board',
+  s9: 'Council Reporting',
+};
+
 interface PrototypeWorkspaceProps {
   initialScreen?: ScreenId;
 }
@@ -23,6 +35,8 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
   const searchParams = useSearchParams();
 
   const [currentScreenId, setCurrentScreenId] = useState<ScreenId>(initialScreen);
+  const [viewMode, setViewMode] = useState<'real-site' | 'figma-canvas'>('real-site');
+  const [showRubricTags, setShowRubricTags] = useState<boolean>(false);
   const [viewportMode, setViewportMode] = useState<ViewportMode>('auto');
   const [scheme, setScheme] = useState<ColorScheme>('scheme-b');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -59,10 +73,23 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
           setActiveUser(parsed);
         }
       }
+      const savedMode = sessionStorage.getItem('hartwell_view_mode');
+      if (savedMode === 'real-site' || savedMode === 'figma-canvas') {
+        setViewMode(savedMode);
+      }
     } catch {
       // ignore storage errors
     }
   }, []);
+
+  const updateViewMode = (mode: 'real-site' | 'figma-canvas') => {
+    setViewMode(mode);
+    try {
+      sessionStorage.setItem('hartwell_view_mode', mode);
+    } catch {
+      // ignore
+    }
+  };
 
   // Interactive form states for enhanced prototype realism while preserving exact defaults
   const [selectedDate, setSelectedDate] = useState<string>('2026-11-02');
@@ -90,7 +117,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
     email: false,
   });
 
-  // Sync with prop & URL query parameters (?screen=s8&scheme=scheme-b&vp=desktop&modal=1)
+  // Sync with prop & URL query parameters (?screen=s8&scheme=scheme-b&vp=desktop&modal=1&view=figma)
   useEffect(() => {
     setCurrentScreenId(initialScreen);
   }, [initialScreen]);
@@ -100,6 +127,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
     const qScheme = searchParams.get('scheme');
     const qVp = searchParams.get('vp');
     const qModal = searchParams.get('modal');
+    const qView = searchParams.get('view');
 
     if (isValidScreenId(qScreen)) {
       setCurrentScreenId(qScreen.toLowerCase() as ScreenId);
@@ -112,6 +140,11 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
     }
     if (qModal === '1') {
       setModalOpen(true);
+    }
+    if (qView === 'figma' || qView === 'figma-canvas') {
+      setViewMode('figma-canvas');
+    } else if (qView === 'real' || qView === 'real-site') {
+      setViewMode('real-site');
     }
   }, [searchParams]);
 
@@ -205,22 +238,50 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
   const memberBScreens = ALL_SCREEN_IDS.filter((id) => SCREEN_META[id].memberGroup === 'B');
 
   return (
-    <div className="prototype-root" data-theme={scheme} data-high-contrast={String(highContrast)}>
+    <div
+      className={`prototype-root ${viewMode === 'real-site' ? 'real-site-mode' : ''} ${
+        showRubricTags ? 'show-rubric-tags' : ''
+      }`}
+      data-theme={scheme}
+      data-high-contrast={String(highContrast)}
+    >
       {/* TOP FIGMA / CASE TOOL BAR */}
       <header className="case-toolbar">
         <div className="case-brand">
-          <span className="figma-badge">Figma Multi-Viewport Prototype</span>
+          <span className="figma-badge">
+            {viewMode === 'real-site' ? 'Live Hartwell Portal' : 'Figma Multi-Viewport Prototype'}
+          </span>
           <div>
             <div className="case-title">
               Hartwell Primary School — Sustainable Travel System (S1–S9 | 2-Member Equal Split: 4.5 Screens Each)
             </div>
             <div className="case-subtitle">
-              Member A (Sofia Mironenko: S1–S4 + S5 Co-Lead) &amp; Member B (S5 Co-Lead + S6–S9) | Mobile App + PC Web + Classroom Smartboard
+              Member A (Sofia Mironenko: S1–S4 + S5 Co-Lead) &amp; Member B (Kim Le: S5 Co-Lead + S6–S9) | Real Site + Figma Prototype
             </div>
           </div>
         </div>
 
         <div className="toolbar-controls">
+          {/* Real Site vs Figma Prototype Mode Switcher */}
+          <div className="btn-group" title="Toggle between Live Real Website and Figma Prototype Canvas">
+            <button
+              id="mode-real-site"
+              type="button"
+              className={`tb-btn ${viewMode === 'real-site' ? 'active' : ''}`}
+              onClick={() => updateViewMode('real-site')}
+            >
+              🌿 Real Site Mode (Hartwell Theme)
+            </button>
+            <button
+              id="mode-figma-canvas"
+              type="button"
+              className={`tb-btn ${viewMode === 'figma-canvas' ? 'active-mode' : ''}`}
+              onClick={() => updateViewMode('figma-canvas')}
+            >
+              📐 Figma Canvas Mode
+            </button>
+          </div>
+
           {/* Material UI Stakeholder Demo Persona Bar */}
           <Stack
             direction="row"
@@ -295,62 +356,66 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
             </Tooltip>
           </Stack>
 
-          {/* Viewport Switcher: Auto / Mobile / Desktop / Whiteboard */}
-          <div className="btn-group" title="Switch Viewport Form Factor">
-            <button
-              id="vp-auto"
-              type="button"
-              className={`tb-btn ${viewportMode === 'auto' ? 'active-mode' : ''}`}
-              onClick={() => setViewportMode('auto')}
-            >
-              Auto Form-Factor
-            </button>
-            <button
-              id="vp-mobile"
-              type="button"
-              className={`tb-btn ${viewportMode === 'mobile' ? 'active-mode' : ''}`}
-              onClick={() => setViewportMode('mobile')}
-            >
-              📱 Mobile App
-            </button>
-            <button
-              id="vp-desktop"
-              type="button"
-              className={`tb-btn ${viewportMode === 'desktop' ? 'active-mode' : ''}`}
-              onClick={() => setViewportMode('desktop')}
-            >
-              💻 PC / Classroom Whiteboard
-            </button>
-          </div>
+          {/* Viewport Switcher: Auto / Mobile / Desktop / Whiteboard (shown in Figma Canvas mode) */}
+          {viewMode === 'figma-canvas' && (
+            <>
+              <div className="btn-group" title="Switch Viewport Form Factor">
+                <button
+                  id="vp-auto"
+                  type="button"
+                  className={`tb-btn ${viewportMode === 'auto' ? 'active-mode' : ''}`}
+                  onClick={() => setViewportMode('auto')}
+                >
+                  Auto Form-Factor
+                </button>
+                <button
+                  id="vp-mobile"
+                  type="button"
+                  className={`tb-btn ${viewportMode === 'mobile' ? 'active-mode' : ''}`}
+                  onClick={() => setViewportMode('mobile')}
+                >
+                  📱 Mobile App
+                </button>
+                <button
+                  id="vp-desktop"
+                  type="button"
+                  className={`tb-btn ${viewportMode === 'desktop' ? 'active-mode' : ''}`}
+                  onClick={() => setViewportMode('desktop')}
+                >
+                  💻 PC / Classroom Whiteboard
+                </button>
+              </div>
 
-          {/* Colour Scheme Switcher */}
-          <div className="btn-group">
-            <button
-              id="btn-scheme-a"
-              type="button"
-              className={`tb-btn ${scheme === 'scheme-a' ? 'active-navy' : ''}`}
-              onClick={() => setScheme('scheme-a')}
-            >
-              Scheme A: Navy (Rejected)
-            </button>
-            <button
-              id="btn-scheme-b"
-              type="button"
-              className={`tb-btn ${scheme === 'scheme-b' ? 'active' : ''}`}
-              onClick={() => setScheme('scheme-b')}
-            >
-              Scheme B: Eco-Green (Selected)
-            </button>
-          </div>
+              {/* Colour Scheme Switcher */}
+              <div className="btn-group">
+                <button
+                  id="btn-scheme-a"
+                  type="button"
+                  className={`tb-btn ${scheme === 'scheme-a' ? 'active-navy' : ''}`}
+                  onClick={() => setScheme('scheme-a')}
+                >
+                  Scheme A: Navy (Rejected)
+                </button>
+                <button
+                  id="btn-scheme-b"
+                  type="button"
+                  className={`tb-btn ${scheme === 'scheme-b' ? 'active' : ''}`}
+                  onClick={() => setScheme('scheme-b')}
+                >
+                  Scheme B: Eco-Green (Selected)
+                </button>
+              </div>
 
-          <button
-            type="button"
-            className="tb-btn"
-            style={{ background: '#334155', color: '#fff', borderRadius: '6px' }}
-            onClick={() => setHistoryOpen((prev) => !prev)}
-          >
-            Version History (2 Members)
-          </button>
+              <button
+                type="button"
+                className="tb-btn"
+                style={{ background: '#334155', color: '#fff', borderRadius: '6px' }}
+                onClick={() => setHistoryOpen((prev) => !prev)}
+              >
+                Version History (2 Members)
+              </button>
+            </>
+          )}
         </div>
       </header>
 
@@ -440,6 +505,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
 
             {/* Top Status Bar */}
             <div className="device-statusbar">
+              <span>08:46 AM &bull; Boroondara SafeNet &bull; {meta.url}</span>
               <span className="sla-pill">SLA: 0.38s Live Cloud Sync</span>
             </div>
 
@@ -452,13 +518,163 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                     role="img"
                     aria-label="Hartwell Primary School stag crest"
                   ></span>
-                  <span className="school-title">
-                    Hartwell Primary School — Sustainable Travel System
-                  </span>
+                  <div>
+                    <span className="school-title">
+                      Hartwell Primary School — Sustainable Travel Portal
+                    </span>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                        color: 'rgba(255,255,255,0.72)',
+                        marginTop: 3,
+                      }}
+                    >
+                      Active Morning Commute &bull; {activeUser.name} ({activeUser.roleLabel})
+                    </div>
+                  </div>
                 </div>
+
+                {viewMode === 'real-site' && (
+                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+                    <Button
+                      component={Link}
+                      href="/parent-login"
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        color: '#ffffff',
+                        borderColor: 'rgba(255,255,255,0.35)',
+                        fontSize: 12,
+                      }}
+                    >
+                      Parent Login
+                    </Button>
+                    <Button
+                      component={Link}
+                      href="/parent-signup"
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        color: '#ffffff',
+                        borderColor: 'rgba(255,255,255,0.35)',
+                        fontSize: 12,
+                      }}
+                    >
+                      Parent Sign Up
+                    </Button>
+                    <Button
+                      component={Link}
+                      href="/admin-login"
+                      size="small"
+                      variant="contained"
+                      disableElevation
+                      sx={{
+                        bgcolor: '#2f7d4d',
+                        color: '#ffffff',
+                        fontSize: 12,
+                      }}
+                    >
+                      Staff / Admin Login
+                    </Button>
+                  </Stack>
+                )}
               </div>
               <div className="screen-subtitle-bar"></div>
             </div>
+
+            {/* Real-Site Horizontal Portal Subnav + Editorial Hero Header */}
+            {viewMode === 'real-site' && (
+              <>
+                <nav className="real-site-subnav" aria-label="Portal sections">
+                  <Stack direction="row" spacing={0.75} sx={{ flexWrap: 'wrap', gap: 0.75 }}>
+                    {ALL_SCREEN_IDS.map((id) => {
+                      const active = currentScreenId === id;
+                      return (
+                        <Button
+                          key={id}
+                          size="small"
+                          variant={active ? 'contained' : 'outlined'}
+                          color="primary"
+                          disableElevation
+                          onClick={() => navigateToScreen(id)}
+                          sx={{
+                            fontSize: 12,
+                            py: 0.6,
+                            px: 1.5,
+                            borderRadius: 2.5,
+                            borderColor: active ? '#123e2b' : '#cbd7cf',
+                            bgcolor: active ? '#123e2b' : '#ffffff',
+                            color: active ? '#ffffff' : '#17221c',
+                          }}
+                        >
+                          {REAL_SITE_TITLES[id]}
+                        </Button>
+                      );
+                    })}
+                  </Stack>
+                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+                    <Tooltip
+                      title={
+                        showRubricTags
+                          ? 'Hide assignment codes (UC-01..09 / REQ tags) for clean stakeholder view'
+                          : 'Show assignment codes (UC-01..09 / REQ tags) for marking & traceability'
+                      }
+                    >
+                      <Button
+                        size="small"
+                        variant={showRubricTags ? 'contained' : 'outlined'}
+                        color="secondary"
+                        onClick={() => setShowRubricTags((prev) => !prev)}
+                        sx={{
+                          fontSize: 11,
+                          py: 0.4,
+                          px: 1.25,
+                          borderRadius: 2,
+                          bgcolor: showRubricTags ? '#e9f4ec' : 'transparent',
+                          color: '#123e2b',
+                          borderColor: '#b9d8c1',
+                        }}
+                      >
+                        {showRubricTags ? '🏷️ Rubric Codes: Visible' : '🏷️ Rubric Codes: Hidden'}
+                      </Button>
+                    </Tooltip>
+                    <Chip
+                      label={`${meta.code} • ${meta.owner}`}
+                      size="small"
+                      sx={{
+                        bgcolor: '#e9f4ec',
+                        color: '#123e2b',
+                        fontWeight: 800,
+                        fontSize: 11,
+                        border: '1px solid #b9d8c1',
+                      }}
+                    />
+                  </Stack>
+                </nav>
+
+                <div className="real-site-hero-bar">
+                  <div>
+                    <div className="real-site-kicker">
+                      <span className="live-dot" aria-hidden="true"></span>
+                      <span>Active Morning Commute Window (08:00–09:00 AM)</span>
+                    </div>
+                    <h1 className="real-site-heading">{REAL_SITE_TITLES[currentScreenId]}</h1>
+                  </div>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    color="primary"
+                    onClick={() => updateViewMode('figma-canvas')}
+                    sx={{ fontSize: 12 }}
+                  >
+                    Switch to Figma Device Frame &rarr;
+                  </Button>
+                </div>
+              </>
+            )}
 
             {/* Screen Body */}
             <div className="screen-body">
@@ -692,9 +908,10 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                         marginBottom: '10px',
                       }}
                     >
-                      Peer Review Fix (Member B &rarr; Sofia M.): Restyled destructive trigger in
-                      high-contrast crimson and added a mandatory 2-step confirmation modal to
-                      prevent false parent panic.
+                      <span className="academic-annotation">
+                        Peer Review Fix (Member B &rarr; Sofia M.):{' '}
+                      </span>
+                      High-priority emergency escalation requiring two-step confirmation before SMS broadcast.
                     </p>
                     <button
                       type="button"
@@ -904,6 +1121,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                       </select>
                     </div>
                     <div
+                      className="academic-annotation"
                       style={{
                         fontSize: '11px',
                         color: 'var(--text-muted)',
@@ -947,6 +1165,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                       <span className="req-pill">Zero Road Crossing Risk</span>
                     </div>
                     <p
+                      className="academic-annotation"
                       style={{
                         fontSize: '12px',
                         color: 'var(--text-muted)',
@@ -1333,8 +1552,10 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                           Mandatory PII Anonymization (Strip Names/IDs)
                         </div>
                         <div style={{ fontSize: '10.5px', color: 'var(--text-muted)' }}>
-                          Peer Review Fix (Sofia M. &rarr; Member B): Locked ON to prevent APP 6
-                          breach
+                          <span className="academic-annotation">
+                            Peer Review Fix (Sofia M. &rarr; Member B):{' '}
+                          </span>
+                          Locked ON to comply with Australian Privacy Principle (APP 6) data minimisation.
                         </div>
                       </div>
                       <span className="toggle-pill locked">[LOCKED ON — APP 6]</span>
@@ -1766,6 +1987,49 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                 <span>Settings</span>
               </button>
             </nav>
+
+            {/* Genuine Primary School Portal Footer in Real-Site Mode */}
+            {viewMode === 'real-site' && (
+              <footer className="real-site-footer">
+                <div className="real-site-footer-inner">
+                  <div>
+                    <h4>Hartwell Primary School — Sustainable Travel Portal</h4>
+                    <p>
+                      Supporting active, safe, and sustainable walking school buses and active travel
+                      for students and families across Camberwell and Boroondara.
+                    </p>
+                    <p style={{ marginTop: 8 }}>
+                      <strong>School Campus:</strong> Milverton Street, Camberwell VIC 3124 &bull;{' '}
+                      <strong>Phone:</strong> (03) 9889 4012 &bull;{' '}
+                      <strong>Email:</strong>{' '}
+                      <a href="mailto:office@hartwellps.vic.edu.au">office@hartwellps.vic.edu.au</a>
+                    </p>
+                  </div>
+                  <div>
+                    <h4>Active Corridors</h4>
+                    <p>
+                      &bull; <a href="#c1" onClick={(e) => { e.preventDefault(); navigateToScreen('s4'); }}>Toorak / Camberwell Rd</a><br />
+                      &bull; <a href="#c2" onClick={(e) => { e.preventDefault(); navigateToScreen('s5'); }}>Myrtle Park Greenway</a><br />
+                      &bull; <a href="#c3" onClick={(e) => { e.preventDefault(); navigateToScreen('s2'); }}>Fordham Gardens Hub</a><br />
+                      &bull; <a href="#c4" onClick={(e) => { e.preventDefault(); navigateToScreen('s7'); }}>Hartwell Station Hub</a>
+                    </p>
+                  </div>
+                  <div>
+                    <h4>Safety &amp; Compliance</h4>
+                    <p>
+                      &bull; Victorian Child Safe Standards<br />
+                      &bull; Privacy Act &amp; APP 6 Minimisation<br />
+                      &bull; Boroondara Safe Routes Partnership<br />
+                      &bull; Emergency Ops: (03) 9889 4012
+                    </p>
+                  </div>
+                </div>
+                <div className="real-site-footer-bottom">
+                  <span>&copy; 2026 Hartwell Primary School. Department of Education Victoria.</span>
+                  <span>System Status: 🟢 All Corridors Operating Normal &bull; SLA 0.38s Cloud Sync</span>
+                </div>
+              </footer>
+            )}
           </div>
         </main>
 

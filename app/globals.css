@@ -1325,3 +1325,263 @@ button.settings-row {
 .vh-item.member-b .vh-author { color: #38BDF8; }
 .vh-item.co-owned .vh-author { color: #C084FC; }
 .vh-desc { font-size: 10.5px; color: #CBD5E1; line-height: 1.35; }
+
+/* ==================== REAL SITE MODE (HARTWELL EDITORIAL PORTAL) ==================== */
+.prototype-root.real-site-mode {
+  --primary: #123e2b;
+  --primary-dark: #0a2b1d;
+  --primary-mid: #2f7d4d;
+  --primary-light: #e9f4ec;
+  --secondary: #2f7d4d;
+  --secondary-light: #e9f4ec;
+  --bg-app: #f7f5ee;
+  --bg-card: #ffffff;
+  --text-main: #17221c;
+  --text-muted: #647069;
+  --border-color: #d8e1da;
+  background:
+    radial-gradient(circle at 8% 12%, rgba(83, 163, 110, 0.13), transparent 25rem),
+    radial-gradient(circle at 92% 88%, rgba(18, 62, 43, 0.09), transparent 28rem),
+    #f7f5ee;
+  color: #17221c;
+}
+
+.prototype-root.real-site-mode:not(.show-rubric-tags) .control-type-hint,
+.prototype-root.real-site-mode:not(.show-rubric-tags) .req-pill,
+.prototype-root.real-site-mode:not(.show-rubric-tags) .academic-annotation {
+  display: none !important;
+}
+
+.prototype-root.real-site-mode .sidebar,
+.prototype-root.real-site-mode .version-history-drawer,
+.prototype-root.real-site-mode .device-mode-pill,
+.prototype-root.real-site-mode .browser-chrome-bar {
+  display: none !important;
+}
+
+.prototype-root.real-site-mode .stage {
+  background: transparent;
+  padding: 0;
+  align-items: stretch;
+}
+
+.prototype-root.real-site-mode .device-frame,
+.prototype-root.real-site-mode .device-frame.desktop-frame {
+  width: 100%;
+  min-height: calc(100vh - 54px);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.prototype-root.real-site-mode .device-statusbar {
+  background: #0a2b1d;
+  padding: 8px clamp(20px, 5vw, 72px);
+  font-size: 12px;
+}
+
+.prototype-root.real-site-mode .app-header {
+  background: linear-gradient(150deg, rgba(10, 43, 29, 0.96), rgba(18, 62, 43, 0.9)), #123e2b;
+  padding: 24px clamp(20px, 5vw, 72px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.prototype-root.real-site-mode .school-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(22px, 2.6vw, 32px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.prototype-root.real-site-mode .real-site-subnav {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #d8e1da;
+  padding: 12px clamp(20px, 5vw, 72px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.prototype-root.real-site-mode .real-site-hero-bar {
+  max-width: 1240px;
+  width: 100%;
+  margin: 26px auto 0;
+  padding: 0 clamp(20px, 5vw, 48px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.prototype-root.real-site-mode .real-site-kicker {
+  color: #2f7d4d;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.prototype-root.real-site-mode .live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
+  display: inline-block;
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.25); opacity: 0.7; }
+}
+
+.prototype-root.real-site-mode .real-site-heading {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(30px, 3.5vw, 44px);
+  font-weight: 500;
+  color: #0a2b1d;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+
+.prototype-root.real-site-mode .screen-body {
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 22px clamp(20px, 5vw, 48px) 48px;
+  gap: 20px;
+}
+
+.prototype-root.real-site-mode .desktop-split {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .prototype-root.real-site-mode .desktop-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.prototype-root.real-site-mode .card {
+  border-radius: 18px;
+  border: 1px solid #d8e1da;
+  padding: 24px 26px;
+  box-shadow: 0 20px 50px rgba(10, 43, 29, 0.08);
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.prototype-root.real-site-mode .card-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: -0.02em;
+  color: #0a2b1d;
+}
+
+.prototype-root.real-site-mode .input-box,
+.prototype-root.real-site-mode .select-box {
+  height: 48px;
+  padding: 0 15px;
+  border: 1px solid #cbd7cf;
+  border-radius: 12px;
+  background: #ffffff;
+  font-size: 14px;
+}
+
+.prototype-root.real-site-mode .btn-primary {
+  min-height: 50px;
+  border-radius: 12px;
+  background: #123e2b;
+  font-size: 14px;
+  font-weight: 800;
+  box-shadow: 0 12px 28px rgba(18, 62, 43, 0.18);
+}
+
+.prototype-root.real-site-mode .btn-danger-outline {
+  min-height: 50px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.prototype-root.real-site-mode .bottom-nav {
+  max-width: 1240px;
+  width: calc(100% - 40px);
+  margin: 0 auto 28px;
+  border: 1px solid #d8e1da;
+  border-radius: 16px;
+  padding: 8px;
+  box-shadow: 0 18px 40px rgba(10, 43, 29, 0.1);
+}
+
+/* Genuine Primary School Portal Footer */
+.real-site-footer {
+  border-top: 1px solid #d8e1da;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 42px clamp(20px, 5vw, 72px) 32px;
+  color: #647069;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.real-site-footer-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 32px;
+}
+
+@media (max-width: 768px) {
+  .real-site-footer-inner {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+.real-site-footer h4 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 16px;
+  color: #123e2b;
+  margin-bottom: 8px;
+}
+
+.real-site-footer a {
+  color: #2f7d4d;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.real-site-footer a:hover {
+  text-decoration: underline;
+}
+
+.real-site-footer-bottom {
+  max-width: 1240px;
+  margin: 28px auto 0;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 11.5px;
+}
+
