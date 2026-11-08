@@ -48,6 +48,30 @@
   --gold-text: #075985;
 }
 
+body[data-dark-mode="true"],
+[data-dark-mode="true"] {
+  --primary: #4ade80;
+  --primary-dark: #15803d;
+  --primary-mid: #22c55e;
+  --primary-light: #064e3b;
+  --secondary: #2dd4bf;
+  --secondary-light: #134e4a;
+  --bg-app: #0f172a;
+  --bg-card: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: #334155;
+  --alert-amber-bg: #451a03;
+  --alert-amber-border: #d97706;
+  --alert-amber-text: #fde68a;
+  --alert-crimson-bg: #450a0a;
+  --alert-crimson-border: #dc2626;
+  --alert-crimson-text: #fca5a5;
+  --gold-bg: #422006;
+  --gold-border: #eab308;
+  --gold-text: #fef08a;
+}
+
 body[data-high-contrast="true"],
 [data-high-contrast="true"] {
   --primary: #000000;
@@ -1817,6 +1841,61 @@ button.settings-row {
 .strip-badge.vicroads-badge {
   background: #ea580c;
   color: #ffffff;
+}
+
+.strip-badge.bom-badge-alert {
+  background: #b91c1c;
+  color: #ffffff;
+  animation: pulse-badge 1.8s infinite ease-in-out;
+}
+
+.strip-badge.vicroads-badge-alert {
+  background: #c2410c;
+  color: #ffffff;
+}
+
+.commute-status-strip.hazard-active {
+  background: #450a0a;
+  border-bottom: 2px solid #ef4444;
+}
+
+.live-dot.alert {
+  background: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.35);
+}
+
+@keyframes pulse-badge {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.9; }
+}
+
+/* Subtle Mobile Device Frame Boundary for Handheld Screens (S1–S5) */
+.prototype-root.real-site-mode #pane-s1,
+.prototype-root.real-site-mode #pane-s2,
+.prototype-root.real-site-mode #pane-s3,
+.prototype-root.real-site-mode #pane-s4,
+.prototype-root.real-site-mode #pane-s5 {
+  max-width: 580px;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid #cbd5e1;
+  border-radius: 16px;
+  padding: 16px;
+  background: #ffffff;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 640px) {
+  .prototype-root.real-site-mode #pane-s1,
+  .prototype-root.real-site-mode #pane-s2,
+  .prototype-root.real-site-mode #pane-s3,
+  .prototype-root.real-site-mode #pane-s4,
+  .prototype-root.real-site-mode #pane-s5 {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 10px 0;
+  }
 }
 
 /* Notification Bell & Dropdown */

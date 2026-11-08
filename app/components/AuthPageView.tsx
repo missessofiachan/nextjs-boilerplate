@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Alert } from '@mui/material';
 import '../auth.css';
 
@@ -75,12 +75,17 @@ function EyeOffIcon() {
 
 export default function AuthPageView({ variant }: { variant: AuthVariant }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const roleParam = searchParams.get('role');
+  const isTeacherDuty = roleParam === 'teacher' || roleParam !== 'admin';
+
   const formRef = useRef<HTMLFormElement>(null);
   const statusRef = useRef<HTMLDivElement>(null);
 
   const [showPass1, setShowPass1] = useState(false);
   const [showPass2, setShowPass2] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
+  const [shiftOtp, setShiftOtp] = useState('849-201');
 
   const loginWithDemo = (account: DemoAccount, immediate = false) => {
     const form = formRef.current;
@@ -334,7 +339,10 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
             <form ref={formRef} data-auth-form onSubmit={handleSubmit} noValidate>
               <div className="field">
                 <div className="field-head">
-                  <label htmlFor="email">Email address</label>
+                  <label htmlFor="email">Guardian email address</label>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#15803d' }}>
+                    ✓ Pre-Linked Enrolment Record
+                  </span>
                 </div>
                 <div className="input-wrap">
                   <input
@@ -342,7 +350,8 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
                     name="email"
                     type="email"
                     autoComplete="email"
-                    placeholder="you@example.com"
+                    defaultValue="s.mitchell@hartwellps.vic.edu.au"
+                    placeholder="s.mitchell@hartwellps.vic.edu.au"
                     required
                   />
                 </div>
@@ -365,7 +374,8 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
                     name="password"
                     type={showPass1 ? 'text' : 'password'}
                     autoComplete="current-password"
-                    placeholder="Enter your password"
+                    defaultValue="HartwellParent2026!"
+                    placeholder="••••••••••••"
                     minLength={8}
                     data-password-input
                     required
@@ -399,9 +409,37 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
               )}
             </form>
 
-            <p className="form-footnote">
-              New to the travel portal? <Link href="/parent-signup">Create a parent account</Link>
-            </p>
+            <div
+              className="form-footnote"
+              style={{
+                background: 'rgba(34, 197, 94, 0.08)',
+                border: '1px solid rgba(34, 197, 94, 0.25)',
+                borderRadius: '8px',
+                padding: '10px 12px',
+                marginTop: '16px',
+                textAlign: 'left',
+                fontSize: '12px',
+                lineHeight: 1.45,
+              }}
+            >
+              <div style={{ fontWeight: 800, color: '#123e2b', marginBottom: '3px' }}>
+                🛡️ Authorized Guardian Verification (SRS ParentGuardian Entity)
+              </div>
+              <div style={{ color: '#4b5563' }}>
+                Account pre-linked via Hartwell PS Enrolment Record &bull;{' '}
+                <span style={{ fontWeight: 700, color: '#15803d' }}>
+                  No-Smartphone / Two-Way SMS Parity Active (REQ-ACC-01 &amp; REQ-ETH-01)
+                </span>
+                . If you need SMS-only emergency dispatch or manual verification, contact{' '}
+                <a
+                  href="mailto:office@hartwellps.vic.edu.au?subject=SMS%20Access%20Request"
+                  style={{ textDecoration: 'underline', fontWeight: 600 }}
+                >
+                  office@hartwellps.vic.edu.au
+                </a>
+                .
+              </div>
+            </div>
           </div>
         </section>
       </main>
@@ -745,10 +783,16 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
             <Link href="/parent-login">
               Parent &amp; Carer
             </Link>
-            <Link href="/admin-login?role=teacher" aria-current="page">
+            <Link
+              href="/admin-login?role=teacher"
+              aria-current={isTeacherDuty ? 'page' : undefined}
+            >
               Teacher &amp; Duty
             </Link>
-            <Link href="/admin-login?role=admin">
+            <Link
+              href="/admin-login?role=admin"
+              aria-current={!isTeacherDuty ? 'page' : undefined}
+            >
               School Admin
             </Link>
           </nav>
@@ -765,20 +809,27 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
               <path d="M12 8v4M12 16h.01" />
             </svg>
             <span>
-              This area contains sensitive student travel information. Sign in only from a trusted
-              school-managed device.
+              {isTeacherDuty
+                ? 'Duty Route Assistant & Teacher access. Roadside shift geofencing active (440px Handheld).'
+                : 'School Administration & Operations. Full roll-call data, detour overrides and council reporting.'}
             </span>
           </div>
 
           {renderDemoCard(
-            [DEMO_ACCOUNTS.teacher, DEMO_ACCOUNTS.admin],
-            'Evaluation Credentials: Staff Accounts (Teacher & Admin)'
+            isTeacherDuty
+              ? [DEMO_ACCOUNTS.teacher]
+              : [DEMO_ACCOUNTS.admin],
+            isTeacherDuty
+              ? 'Evaluation Credentials: Ms. Lin (Teacher & Duty Assistant)'
+              : 'Evaluation Credentials: Kim Le (School Travel Admin)'
           )}
 
           <form ref={formRef} data-auth-form onSubmit={handleSubmit} noValidate>
             <div className="field">
               <div className="field-head">
-                <label htmlFor="staff-email">Staff email address</label>
+                <label htmlFor="staff-email">
+                  {isTeacherDuty ? 'Duty Assistant / Staff email' : 'Staff email address'}
+                </label>
               </div>
               <div className="input-wrap">
                 <input
@@ -786,6 +837,7 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
                   name="email"
                   type="email"
                   autoComplete="username"
+                  defaultValue={isTeacherDuty ? 'teacher@hartwellps.vic.edu.au' : 'admin@hartwellps.vic.edu.au'}
                   placeholder="name@hartwellps.vic.edu.au"
                   required
                 />
@@ -809,6 +861,7 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
                   name="password"
                   type={showPass1 ? 'text' : 'password'}
                   autoComplete="current-password"
+                  defaultValue={isTeacherDuty ? 'HartwellTeacher2026!' : 'HartwellAdmin2026!'}
                   placeholder="Enter your staff password"
                   minLength={8}
                   data-password-input
@@ -827,8 +880,64 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
               <p className="field-error">Enter your password (at least 8 characters).</p>
             </div>
 
+            {/* Dynamic Morning Shift OTP & Active Shift Window (REQ-SAF-01 & SWR-ETH-01) */}
+            {isTeacherDuty && (
+              <div
+                style={{
+                  background: 'rgba(34, 197, 94, 0.08)',
+                  border: '1px solid rgba(34, 197, 94, 0.3)',
+                  borderRadius: '10px',
+                  padding: '12px 14px',
+                  margin: '14px 0',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <label htmlFor="duty-otp" style={{ fontSize: '12px', fontWeight: 800, color: '#123e2b' }}>
+                    🔑 6-Digit Dynamic Shift OTP (REQ-SAF-01)
+                  </label>
+                  <span
+                    style={{
+                      fontSize: '10.5px',
+                      fontWeight: 800,
+                      background: '#15803d',
+                      color: '#ffffff',
+                      padding: '2px 8px',
+                      borderRadius: '999px',
+                    }}
+                  >
+                    Active Shift Window: 08:00–09:15 AM
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <input
+                    id="duty-otp"
+                    type="text"
+                    value={shiftOtp}
+                    onChange={(e) => setShiftOtp(e.target.value)}
+                    style={{
+                      fontFamily: 'monospace',
+                      fontSize: '15px',
+                      fontWeight: 800,
+                      letterSpacing: '0.2em',
+                      textAlign: 'center',
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      border: '1px solid #cbd5e1',
+                      background: '#ffffff',
+                      color: '#123e2b',
+                      width: '140px',
+                    }}
+                    maxLength={7}
+                  />
+                  <div style={{ fontSize: '11px', color: '#647069', flex: 1, lineHeight: 1.35 }}>
+                    Matches <code>DutyRouteAssistant.dynamicOTP</code> &bull; GPS auto-terminates at 09:15 AM
+                  </div>
+                </div>
+              </div>
+            )}
+
             <button className="submit-button" type="submit">
-              Continue to admin portal
+              {isTeacherDuty ? 'Sign in to Duty & Staff Portal' : 'Continue to admin portal'}
             </button>
             {statusMessage && (
               <Alert

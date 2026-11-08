@@ -39,6 +39,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
   const [showRubricTags, setShowRubricTags] = useState<boolean>(false);
   const [viewportMode, setViewportMode] = useState<ViewportMode>('auto');
   const [scheme, setScheme] = useState<ColorScheme>('scheme-b');
+  const [darkMode, setDarkMode] = useState<boolean>(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [historyOpen, setHistoryOpen] = useState<boolean>(true);
   const [sosDispatchedBanner, setSosDispatchedBanner] = useState<boolean>(false);
@@ -137,6 +138,21 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
   const [selectedGroup, setSelectedGroup] = useState<string>(
     'Group G-04: Toorak Rd / Hartwell East 500m Hub (08:15 AM)'
   );
+  const [rosterFilter, setRosterFilter] = useState<'all' | 'pending' | 'checked'>('all');
+  const [noahCheckedIn, setNoahCheckedIn] = useState<boolean>(false);
+  const [earlyHandoffMaya, setEarlyHandoffMaya] = useState<boolean>(false);
+  const [sosChannels, setSosChannels] = useState<{ sms: boolean; email: boolean }>({
+    sms: true,
+    email: true,
+  });
+  const [mobilitySupportVerified, setMobilitySupportVerified] = useState<boolean>(true);
+  const [autoPushDetour, setAutoPushDetour] = useState<boolean>(true);
+  const [s6CheckedStudents, setS6CheckedStudents] = useState<{ [id: string]: boolean }>({
+    'leo': true,
+    'maya': true,
+    'lucas': true,
+  });
+  const [s9DateRange, setS9DateRange] = useState<string>('Term 4: 01/10/2026 – 02/11/2026');
   const [exportFormat, setExportFormat] = useState<'pdf' | 'csv'>('pdf');
   const [selectedCorridor, setSelectedCorridor] = useState<string>(
     'Corridor C-01: Toorak Rd / Camberwell Rd Crossing'
@@ -193,6 +209,10 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
   useEffect(() => {
     document.body.setAttribute('data-theme', scheme);
   }, [scheme]);
+
+  useEffect(() => {
+    document.body.setAttribute('data-dark-mode', String(darkMode));
+  }, [darkMode]);
 
   useEffect(() => {
     document.body.setAttribute('data-high-contrast', String(highContrast));
@@ -678,6 +698,19 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
 
                     <button
                       type="button"
+                      className={`header-btn ${darkMode ? 'active' : ''}`}
+                      onClick={() => {
+                        const next = !darkMode;
+                        setDarkMode(next);
+                        showToast(next ? '🌙 Dark Mode enabled' : '☀️ Light Mode enabled');
+                      }}
+                      title="Toggle dark mode / light mode theme"
+                    >
+                      {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
+                    </button>
+
+                    <button
+                      type="button"
                       className={`header-btn ${settingsOpen ? 'active' : ''}`}
                       aria-controls="settings-panel"
                       aria-expanded={settingsOpen}
@@ -856,19 +889,46 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
 
             {/* Real-Site Live BOM Weather & VicRoads Status Strip */}
             {viewMode === 'real-site' && (
-              <div className="commute-status-strip">
-                <div className="status-strip-item">
-                  <span className="strip-badge bom-badge">BOM Live</span>
-                  <span>🌤️ 16.4°C Camberwell &bull; Rain 0% &bull; Wind 11 km/h S</span>
-                </div>
-                <div className="status-strip-item">
-                  <span className="strip-badge vicroads-badge">VicRoads</span>
-                  <span>🚦 40 km/h School Zones Active &bull; Toorak Rd Clear</span>
-                </div>
-                <div className="status-strip-item">
-                  <span className="live-dot" aria-hidden="true"></span>
-                  <span>Supervision Window: 08:00–09:15 AM &bull; SLA 0.38s Sync</span>
-                </div>
+              <div
+                className={`commute-status-strip ${
+                  currentScreenId === 's4' || currentScreenId === 's5' ? 'hazard-active' : ''
+                }`}
+              >
+                {currentScreenId === 's4' || currentScreenId === 's5' ? (
+                  <>
+                    <div className="status-strip-item">
+                      <span className="strip-badge bom-badge-alert">BOM LIVE SQUALL</span>
+                      <span style={{ color: '#fed7aa', fontWeight: 700 }}>
+                        ⛈️ 16.0°C Camberwell &bull; Rain 80% Squall Warning &bull; Wind 38 km/h Gusts
+                      </span>
+                    </div>
+                    <div className="status-strip-item">
+                      <span className="strip-badge vicroads-badge-alert">VICROADS HAZARD</span>
+                      <span style={{ color: '#fca5a5', fontWeight: 700 }}>
+                        ⚠️ Toorak Rd Crossing BLOCKED (Flooding) &bull; CR-01 Myrtle Park Detour Active
+                      </span>
+                    </div>
+                    <div className="status-strip-item">
+                      <span className="live-dot alert" aria-hidden="true"></span>
+                      <span>Automated Detour Routing Active &bull; SLA 0.38s Sync</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="status-strip-item">
+                      <span className="strip-badge bom-badge">BOM Live</span>
+                      <span>🌤️ 16.4°C Camberwell &bull; Rain 0% &bull; Wind 11 km/h S</span>
+                    </div>
+                    <div className="status-strip-item">
+                      <span className="strip-badge vicroads-badge">VicRoads</span>
+                      <span>🚦 40 km/h School Zones Active &bull; Toorak Rd Clear</span>
+                    </div>
+                    <div className="status-strip-item">
+                      <span className="live-dot" aria-hidden="true"></span>
+                      <span>Supervision Window: 08:00–09:15 AM &bull; SLA 0.38s Sync</span>
+                    </div>
+                  </>
+                )}
               </div>
             )}
 
@@ -1095,7 +1155,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                     </div>
                     <div className="metrics-grid" style={{ marginBottom: '10px' }}>
                       <div className="metric-box">
-                        <div className="metric-val">1,840</div>
+                        <div className="metric-val">{noahCheckedIn ? '1,960' : '1,840'}</div>
                         <div className="metric-lbl">Group Steps</div>
                       </div>
                       <div className="metric-box">
@@ -1103,23 +1163,171 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                         <div className="metric-lbl">Distance</div>
                       </div>
                       <div className="metric-box">
-                        <div className="metric-val">14 / 15</div>
+                        <div className="metric-val" style={{ color: noahCheckedIn ? '#15803d' : '#b45309' }}>
+                          {noahCheckedIn ? '15 / 15' : '14 / 15'}
+                        </div>
                         <div className="metric-lbl">Checked In</div>
                       </div>
                     </div>
 
-                    <div className="roster-row">
-                      <span>1. Leo Mitchell (STU-1042, Yr 4B) — Bag Tag QR</span>
-                      <span className="status-pill-ok">08:22 AM Checked In</span>
+                    {/* Roster Filter Pills */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '6px',
+                        marginBottom: '8px',
+                        padding: '4px 6px',
+                        background: 'var(--bg-card-subtle, rgba(0,0,0,0.03))',
+                        borderRadius: '6px',
+                      }}
+                    >
+                      <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)' }}>
+                        Filter Roster:
+                      </div>
+                      <div style={{ display: 'flex', gap: '4px' }}>
+                        <button
+                          type="button"
+                          className={`seg-btn ${rosterFilter === 'all' ? 'active' : ''}`}
+                          style={{ padding: '3px 8px', fontSize: '11px' }}
+                          onClick={() => setRosterFilter('all')}
+                        >
+                          All (15)
+                        </button>
+                        <button
+                          type="button"
+                          className={`seg-btn ${rosterFilter === 'pending' ? 'active' : ''}`}
+                          style={{ padding: '3px 8px', fontSize: '11px' }}
+                          onClick={() => setRosterFilter('pending')}
+                        >
+                          Pending ({noahCheckedIn ? '0' : '1'})
+                        </button>
+                        <button
+                          type="button"
+                          className={`seg-btn ${rosterFilter === 'checked' ? 'active' : ''}`}
+                          style={{ padding: '3px 8px', fontSize: '11px' }}
+                          onClick={() => setRosterFilter('checked')}
+                        >
+                          Checked In ({noahCheckedIn ? '15' : '14'})
+                        </button>
+                      </div>
                     </div>
-                    <div className="roster-row">
-                      <span>2. Maya Chen (STU-1088, Yr 4B) — Bag Tag QR</span>
-                      <span className="status-pill-ok">08:23 AM Checked In</span>
-                    </div>
-                    <div className="roster-row">
-                      <span>15. Noah Patel (STU-1104, Yr 3A) — Unaccounted</span>
-                      <span className="status-pill-warn">Pending @ 08:59 AM</span>
-                    </div>
+
+                    {/* Student Rows with Interactive Actions */}
+                    {(rosterFilter === 'all' || rosterFilter === 'checked') && (
+                      <div className="roster-row">
+                        <span>1. Leo Mitchell (STU-1042, Yr 4B) — Bag Tag QR</span>
+                        <span className="status-pill-ok">08:22 AM Checked In</span>
+                      </div>
+                    )}
+
+                    {(rosterFilter === 'all' || rosterFilter === 'checked') && (
+                      <div className="roster-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <span>2. Maya Chen (STU-1088, Yr 4B)</span>
+                          {earlyHandoffMaya && (
+                            <div style={{ fontSize: '10.5px', color: '#15803d', fontWeight: 700, marginTop: '2px' }}>
+                              ✓ Early Hand-Off: Collected by Guardian (08:35 AM)
+                            </div>
+                          )}
+                        </div>
+                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                          <span className={earlyHandoffMaya ? 'status-pill-ok' : 'status-pill-ok'}>
+                            {earlyHandoffMaya ? 'Handed Off' : '08:23 AM Checked In'}
+                          </span>
+                          <button
+                            type="button"
+                            className="btn-link-action"
+                            style={{
+                              fontSize: '10.5px',
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              border: '1px solid var(--border-color)',
+                              background: 'transparent',
+                              cursor: 'pointer',
+                              color: 'var(--text-muted)',
+                            }}
+                            title="Log mid-route early parent hand-off (Domain Model Exception Flow)"
+                            onClick={() => {
+                              const next = !earlyHandoffMaya;
+                              setEarlyHandoffMaya(next);
+                              showToast(next ? 'Logged early guardian hand-off for Maya Chen' : 'Reverted to active walking bus');
+                            }}
+                          >
+                            {earlyHandoffMaya ? '↩ Undo Hand-Off' : 'Early Hand-Off'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Collapsed 12 Students Visual Indicator */}
+                    {rosterFilter === 'all' && (
+                      <div
+                        style={{
+                          padding: '6px 12px',
+                          margin: '4px 0',
+                          background: 'rgba(0,0,0,0.03)',
+                          border: '1px dashed var(--border-color)',
+                          borderRadius: '6px',
+                          textAlign: 'center',
+                          fontSize: '11px',
+                          color: 'var(--text-muted)',
+                        }}
+                      >
+                        ••• 12 other students checked in en route (Students #3 through #14 verified) •••
+                      </div>
+                    )}
+
+                    {(rosterFilter === 'all' || (rosterFilter === 'pending' && !noahCheckedIn) || (rosterFilter === 'checked' && noahCheckedIn)) && (
+                      <div className="roster-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <span>15. Noah Patel (STU-1104, Yr 3A)</span>
+                          <div style={{ fontSize: '10.5px', color: noahCheckedIn ? '#15803d' : '#b45309' }}>
+                            {noahCheckedIn ? '✓ Arrived at Hub Gate (Manual Scan)' : 'Unaccounted at 500m Hub'}
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                          <span className={noahCheckedIn ? 'status-pill-ok' : 'status-pill-warn'}>
+                            {noahCheckedIn ? '09:01 AM Checked In' : 'Pending @ 08:59 AM'}
+                          </span>
+                          {!noahCheckedIn ? (
+                            <button
+                              type="button"
+                              className="btn-primary"
+                              style={{ padding: '3px 8px', fontSize: '11px', minWidth: 'auto' }}
+                              onClick={() => {
+                                setNoahCheckedIn(true);
+                                showToast('Noah Patel manually checked in via Bag Tag QR Scan');
+                              }}
+                              title="Scan QR bag tag or manually check in Noah Patel live"
+                            >
+                              📷 Scan QR / Check-In
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              className="btn-link-action"
+                              style={{
+                                fontSize: '10.5px',
+                                padding: '2px 6px',
+                                border: '1px solid var(--border-color)',
+                                background: 'transparent',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                color: 'var(--text-muted)',
+                              }}
+                              onClick={() => {
+                                setNoahCheckedIn(false);
+                                showToast('Noah Patel reverted to Pending status');
+                              }}
+                            >
+                              ↩ Reset
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -1170,6 +1378,42 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                       </span>
                       High-priority emergency escalation requiring two-step confirmation before SMS broadcast.
                     </p>
+
+                    {/* Pre-Checked Emergency Escalation Delivery Channels */}
+                    <div
+                      style={{
+                        padding: '10px',
+                        margin: '10px 0 14px',
+                        background: 'rgba(185, 28, 28, 0.06)',
+                        border: '1px solid rgba(185, 28, 28, 0.25)',
+                        borderRadius: '6px',
+                      }}
+                    >
+                      <div style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', color: '#b91c1c', marginBottom: '6px' }}>
+                        Automated Emergency Channels:
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={sosChannels.sms}
+                            onChange={(e) => setSosChannels((c) => ({ ...c, sms: e.target.checked }))}
+                            style={{ accentColor: '#b91c1c' }}
+                          />
+                          <span><strong>Parent SMS Broadcast:</strong> Immediate SMS to all enrolled guardians</span>
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={sosChannels.email}
+                            onChange={(e) => setSosChannels((c) => ({ ...c, email: e.target.checked }))}
+                            style={{ accentColor: '#b91c1c' }}
+                          />
+                          <span><strong>School Admin &amp; Principal:</strong> High-priority inbox dispatch</span>
+                        </label>
+                      </div>
+                    </div>
+
                     <button
                       type="button"
                       className="btn-danger-outline"
@@ -1238,6 +1482,16 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                         </span>
                       </div>
                     </div>
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      style={{ marginTop: '12px', width: '100%', background: '#0a2b1d' }}
+                      onClick={() => {
+                        showToast(`Generated & Exported Walk Summary Report (${exportFormat.toUpperCase()})`);
+                      }}
+                    >
+                      📥 Generate &amp; Export Report ({exportFormat.toUpperCase()})
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1327,6 +1581,16 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                           Severe Detour
                         </button>
                       </div>
+                      <div
+                        style={{
+                          fontSize: '11px',
+                          color: '#b45309',
+                          fontWeight: 600,
+                          marginTop: '6px',
+                        }}
+                      >
+                        ⚡ Auto-triggered by BOM/VicRoads threshold (Precip &gt; 75% &amp; Flooding) &bull; Click to override
+                      </div>
                     </div>
                     <button
                       type="button"
@@ -1398,7 +1662,17 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                           Verify accessible kerb ramps on Myrtle Park detour
                         </div>
                       </div>
-                      <span className="toggle-pill">[CONFIRMED 1:1]</span>
+                      <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={mobilitySupportVerified}
+                          onChange={(e) => setMobilitySupportVerified(e.target.checked)}
+                          style={{ width: '16px', height: '16px', accentColor: 'var(--primary)' }}
+                        />
+                        <span className="toggle-pill" style={{ background: mobilitySupportVerified ? 'var(--primary)' : '#64748b' }}>
+                          {mobilitySupportVerified ? '✓ Verified 1:1' : 'Unverified'}
+                        </span>
+                      </label>
                     </div>
 
                     <div className="toggle-row">
@@ -1410,7 +1684,18 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                           Push live ETA (+4 mins) to enrolled parents on S7
                         </div>
                       </div>
-                      <span className="toggle-pill">[ON — AUTO PUSH]</span>
+                      <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          role="switch"
+                          checked={autoPushDetour}
+                          onChange={(e) => setAutoPushDetour(e.target.checked)}
+                          style={{ width: '16px', height: '16px', accentColor: '#15803d' }}
+                        />
+                        <span className="toggle-pill" style={{ background: autoPushDetour ? '#15803d' : '#64748b' }}>
+                          {autoPushDetour ? 'ON — AUTO PUSH' : 'MANUAL'}
+                        </span>
+                      </label>
                     </div>
                   </div>
 
@@ -1434,7 +1719,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                     </p>
                     <div className="map-view-header">
                       <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--primary)' }}>
-                        Detour Corridor Preview
+                        Detour Corridor Preview &bull; Safe Checkpoints
                       </span>
                       <div className="map-toggle-group" role="group" aria-label="Select detour map view">
                         <button
@@ -1473,23 +1758,57 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                         />
                       </div>
                     ) : (
-                      <div className="map-box" style={{ marginBottom: '12px', height: '120px' }}>
-                        <div className="map-corridor-line"></div>
-                        <span className="map-pin">
-                          {selectedAlternateRoute.split('(')[0].trim()}
-                        </span>
+                      <div style={{ marginBottom: '12px' }}>
+                        {/* Checkpoint Node Flow Progress */}
                         <div
                           style={{
-                            background: 'rgba(255,255,255,0.94)',
-                            padding: '5px 8px',
-                            borderRadius: '6px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '10px 12px',
+                            background: '#0a2b1d',
+                            color: '#ffffff',
+                            borderRadius: '8px',
                             fontSize: '11px',
                             fontWeight: 700,
-                            color: '#111827',
-                            zIndex: 2,
+                            gap: '6px',
+                            marginBottom: '8px',
                           }}
                         >
-                          Sheltered footpath • Crossing Supervisor notified
+                          <div style={{ textAlign: 'center', flex: 1 }}>
+                            <div style={{ color: '#ef4444', fontSize: '13px' }}>⛔ Blocked</div>
+                            <div style={{ fontSize: '10px', opacity: 0.85 }}>Toorak Rd Cross</div>
+                          </div>
+                          <span style={{ color: '#4ade80', fontSize: '14px' }}>&rarr;</span>
+                          <div style={{ textAlign: 'center', flex: 1.2, background: 'rgba(74, 222, 128, 0.15)', padding: '4px', borderRadius: '4px' }}>
+                            <div style={{ color: '#4ade80', fontSize: '13px' }}>🛡️ Myrtle Hub</div>
+                            <div style={{ fontSize: '10px', opacity: 0.9 }}>Sheltered Path (+4m)</div>
+                          </div>
+                          <span style={{ color: '#4ade80', fontSize: '14px' }}>&rarr;</span>
+                          <div style={{ textAlign: 'center', flex: 1 }}>
+                            <div style={{ color: '#60a5fa', fontSize: '13px' }}>🏫 Gate 2</div>
+                            <div style={{ fontSize: '10px', opacity: 0.85 }}>Hartwell School</div>
+                          </div>
+                        </div>
+
+                        <div className="map-box" style={{ height: '100px' }}>
+                          <div className="map-corridor-line"></div>
+                          <span className="map-pin">
+                            {selectedAlternateRoute.split('(')[0].trim()}
+                          </span>
+                          <div
+                            style={{
+                              background: 'rgba(255,255,255,0.94)',
+                              padding: '5px 8px',
+                              borderRadius: '6px',
+                              fontSize: '11px',
+                              fontWeight: 700,
+                              color: '#111827',
+                              zIndex: 2,
+                            }}
+                          >
+                            Sheltered footpath &bull; Crossing Supervisor on duty at Myrtle Park
+                          </div>
                         </div>
                       </div>
                     )}
@@ -1522,6 +1841,30 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                       <span className="card-title">500m Hub Roll Call Verification</span>
                       <span className="req-pill">UC-06 | REQ-TRK-03</span>
                     </div>
+                    {/* Offline Connectivity Pill & Sync State */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '6px 10px',
+                        marginBottom: '10px',
+                        background: 'rgba(34, 197, 94, 0.1)',
+                        border: '1px solid rgba(34, 197, 94, 0.3)',
+                        borderRadius: '6px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                      }}
+                    >
+                      <span style={{ color: '#15803d', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span className="live-dot" style={{ width: '7px', height: '7px' }}></span>
+                        4G Connected &bull; Offline Sync Queue Ready (0 pending)
+                      </span>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '10px' }}>
+                        Local IndexedDB Cache Active
+                      </span>
+                    </div>
+
                     <div className="form-group">
                       <label className="form-label">
                         <span>Active Drop-Off Hub</span>
@@ -1546,19 +1889,128 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                         readOnly
                       />
                     </div>
-                    <div className="roster-row">
-                      <span>Group G-02 Roster (12/12 Checked In)</span>
-                      <span className="status-pill-ok">100% Arrived Safe</span>
+
+                    {/* Expandable Multi-Select Student Checklist (SRS Roll-Call Spec) */}
+                    <div
+                      style={{
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '6px',
+                        padding: '8px 10px',
+                        marginTop: '8px',
+                        background: 'var(--bg-card-subtle, rgba(0,0,0,0.02))',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          paddingBottom: '6px',
+                          borderBottom: '1px solid var(--border-color)',
+                          marginBottom: '6px',
+                          fontSize: '11.5px',
+                          fontWeight: 800,
+                        }}
+                      >
+                        <span>Group G-02 Roster (12/12 Present)</span>
+                        <button
+                          type="button"
+                          className="btn-link-action"
+                          style={{
+                            fontSize: '11px',
+                            color: 'var(--primary)',
+                            background: 'transparent',
+                            border: 0,
+                            cursor: 'pointer',
+                            fontWeight: 700,
+                          }}
+                          onClick={() => {
+                            const allChecked = Object.values(s6CheckedStudents).every(Boolean);
+                            setS6CheckedStudents({
+                              leo: !allChecked,
+                              maya: !allChecked,
+                              lucas: !allChecked,
+                            });
+                          }}
+                        >
+                          {Object.values(s6CheckedStudents).every(Boolean) ? 'Deselect All' : 'Select All Present'}
+                        </button>
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11.5px', cursor: 'pointer' }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <input
+                              type="checkbox"
+                              checked={!!s6CheckedStudents['leo']}
+                              onChange={(e) => setS6CheckedStudents((s) => ({ ...s, leo: e.target.checked }))}
+                              style={{ accentColor: 'var(--primary)' }}
+                            />
+                            <strong>Leo Mitchell</strong> (STU-1042, Yr 4B)
+                          </span>
+                          <span className="status-pill-ok" style={{ fontSize: '10px', padding: '1px 6px' }}>08:44 AM Beacon</span>
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11.5px', cursor: 'pointer' }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <input
+                              type="checkbox"
+                              checked={!!s6CheckedStudents['maya']}
+                              onChange={(e) => setS6CheckedStudents((s) => ({ ...s, maya: e.target.checked }))}
+                              style={{ accentColor: 'var(--primary)' }}
+                            />
+                            <strong>Maya Chen</strong> (STU-1088, Yr 4B)
+                          </span>
+                          <span className="status-pill-ok" style={{ fontSize: '10px', padding: '1px 6px' }}>08:45 AM Beacon</span>
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11.5px', cursor: 'pointer' }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <input
+                              type="checkbox"
+                              checked={!!s6CheckedStudents['lucas']}
+                              onChange={(e) => setS6CheckedStudents((s) => ({ ...s, lucas: e.target.checked }))}
+                              style={{ accentColor: 'var(--primary)' }}
+                            />
+                            <strong>Lucas Nguyen</strong> (STU-1095, Yr 4B)
+                          </span>
+                          <span className="status-pill-ok" style={{ fontSize: '10px', padding: '1px 6px' }}>08:46 AM Beacon</span>
+                        </label>
+                        <div style={{ fontSize: '10px', color: 'var(--text-muted)', textAlign: 'center', paddingTop: '4px' }}>
+                          +9 additional students verified by Gate 2 RFID scanner
+                        </div>
+                      </div>
                     </div>
                   </div>
 
                   <div className="card">
                     <div className="card-header">
                       <span className="card-title">
-                        School Gate Congestion &amp; Walking KPIs
+                        School Gate Congestion &amp; Governance KPIs
                       </span>
                       <span className="req-pill">Victoria Walks Target</span>
                     </div>
+
+                    {/* Project Budget Governance Metric */}
+                    <div
+                      style={{
+                        padding: '8px 10px',
+                        background: 'rgba(30, 58, 138, 0.06)',
+                        border: '1px solid rgba(30, 58, 138, 0.2)',
+                        borderRadius: '6px',
+                        marginBottom: '10px',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 800 }}>
+                        <span style={{ color: '#1e3a8a' }}>Active Travel Grant Budget ($45,000 Allocation)</span>
+                        <span style={{ color: '#15803d' }}>$38,250 Spent (85%)</span>
+                      </div>
+                      <div className="progress-track" style={{ height: '6px', marginTop: '4px' }}>
+                        <div className="progress-fill" style={{ width: '85%', background: '#1e3a8a' }}></div>
+                      </div>
+                      <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                        Beacon hardware: $18.4k &bull; Signage &amp; markings: $14.2k &bull; Remaining contingency: $6,750
+                      </div>
+                    </div>
+
                     <div style={{ fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>
                       Active Walking Mode Share: 39% Baseline &rarr;{' '}
                       <span style={{ color: 'var(--primary)' }}>48.5% Current (Target: 51%)</span>
@@ -1766,7 +2218,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                 className={`screen-pane ${currentScreenId === 's8' ? 'active' : ''}`}
                 id="pane-s8"
               >
-                {/* Teacher Classroom Smartboard / Whiteboard Banner */}
+                {/* Mode Banner: Projected Classroom Smartboard for Teachers vs Family Homeroom Summary for Parents */}
                 <div className="whiteboard-hero">
                   <div>
                     <div
@@ -1778,7 +2230,9 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                         letterSpacing: '0.5px',
                       }}
                     >
-                      💻 Classroom Interactive Whiteboard Mode (Projected by Teacher in Homeroom)
+                      {activeUser.roleLabel.toLowerCase().includes('parent')
+                        ? '🎒 Family View &bull; Homeroom Sustainability & Privacy Consent'
+                        : '💻 Classroom Interactive Whiteboard Mode (Projected by Teacher in Homeroom)'}
                     </div>
                     <div style={{ fontSize: '16px', fontWeight: 900, marginTop: '2px' }}>
                       🏆 Walking Wednesday &amp; Golden Boot Trophy Leaderboard
@@ -1799,7 +2253,9 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                   <div className="card">
                     <div className="card-header">
                       <span className="card-title">
-                        Homeroom Active Travel Podium (Classroom Smartboard)
+                        {activeUser.roleLabel.toLowerCase().includes('parent')
+                          ? 'Class Active Travel Podium (Leo & Sophie\'s Homerooms)'
+                          : 'Homeroom Active Travel Podium (Classroom Smartboard)'}
                       </span>
                       <span className="req-pill">Gamification &amp; Engagement</span>
                     </div>
@@ -1866,9 +2322,31 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                   {/* Right Column: Technoethical Privacy & GPS Consent Manager (UC-08) */}
                   <div className="card">
                     <div className="card-header">
-                      <span className="card-title">Time-Bounded Location Privacy Manager</span>
+                      <span className="card-title">
+                        {activeUser.roleLabel.toLowerCase().includes('parent')
+                          ? 'Parental GPS Telemetry Consent & Privacy'
+                          : 'Time-Bounded Location Privacy Manager'}
+                      </span>
                       <span className="req-pill">UC-08 | REQ-ETH-01 (APP 1/6)</span>
                     </div>
+
+                    {activeUser.roleLabel.toLowerCase().includes('parent') && (
+                      <div
+                        style={{
+                          padding: '8px 10px',
+                          background: 'rgba(34, 197, 94, 0.08)',
+                          border: '1px solid rgba(34, 197, 94, 0.25)',
+                          borderRadius: '6px',
+                          fontSize: '11.5px',
+                          color: '#15803d',
+                          fontWeight: 700,
+                          marginBottom: '10px',
+                        }}
+                      >
+                        🔒 Guardian Consent Active: Your child&apos;s GPS is only gathered inside the strict morning walk window and purged automatically.
+                      </div>
+                    )}
+
                     <div className="form-group">
                       <label className="form-label">
                         <span>Permitted Telemetry Tracking Window</span>
@@ -1910,14 +2388,26 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                       </div>
                       <span className="toggle-pill locked">[CLASS % ONLY]</span>
                     </div>
-                    <button
-                      type="button"
-                      className="btn-primary"
-                      style={{ marginTop: '8px' }}
-                      onClick={() => navigateToScreen('s9')}
-                    >
-                      Open Council Export &amp; WCAG Settings (S9) &rarr;
-                    </button>
+
+                    {activeUser.roleLabel.toLowerCase().includes('parent') ? (
+                      <button
+                        type="button"
+                        className="btn-primary"
+                        style={{ marginTop: '8px' }}
+                        onClick={() => navigateToScreen('s7')}
+                      >
+                        &larr; Return to Live Family Geofence (S7)
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn-primary"
+                        style={{ marginTop: '8px' }}
+                        onClick={() => navigateToScreen('s9')}
+                      >
+                        Open Council Export &amp; WCAG Settings (S9) &rarr;
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1942,6 +2432,22 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                       </span>
                       <span className="req-pill">UC-09 | APP 6 Ethics</span>
                     </div>
+
+                    {/* Date Range Selector for Boroondara Council Export */}
+                    <div className="form-group" style={{ marginBottom: '12px' }}>
+                      <label className="form-label">
+                        <span>Export Term Date Range</span>
+                        <span className="control-type-hint">[Calendar Date Range Selector]</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="input-box"
+                        value={s9DateRange}
+                        onChange={(e) => setS9DateRange(e.target.value)}
+                        placeholder="e.g. Term 4: 01/10/2026 – 02/11/2026"
+                      />
+                    </div>
+
                     <div className="toggle-row">
                       <div>
                         <div style={{ fontSize: '12px', fontWeight: 700 }}>
@@ -1954,7 +2460,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                           Locked ON to comply with Australian Privacy Principle (APP 6) data minimisation.
                         </div>
                       </div>
-                      <span className="toggle-pill locked">[LOCKED ON — APP 6]</span>
+                      <span className="toggle-pill locked">🔒 [LOCKED ON — APP 6]</span>
                     </div>
                     <div className="toggle-row">
                       <div>
@@ -2004,48 +2510,95 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                           150% Extra High
                         </button>
                       </div>
+                      {/* Typography Scale Visual Proof */}
+                      <div
+                        style={{
+                          fontSize: fontScale === '150' ? '15px' : fontScale === '125' ? '13.5px' : '11.5px',
+                          color: 'var(--primary)',
+                          background: 'var(--bg-card-subtle, rgba(0,0,0,0.03))',
+                          padding: '6px 10px',
+                          borderRadius: '6px',
+                          marginTop: '6px',
+                          fontWeight: 600,
+                          transition: 'font-size 0.2s ease',
+                        }}
+                      >
+                        Sample Scaled Text: Active Hub Drop-Off Notice ({fontScale}% zoom)
+                      </div>
                     </div>
+
                     <div className="form-group">
                       <label className="form-label">
                         <span>Multi-Channel Alert Equity (No-Smartphone Parity)</span>
-                        <span className="control-type-hint">[Checkboxes]</span>
+                        <span className="control-type-hint">[Styled Checkboxes]</span>
                       </label>
                       <div
                         style={{
                           fontSize: '12px',
                           fontWeight: 700,
-                          color: 'var(--primary)',
                           display: 'flex',
-                          gap: '12px',
-                          flexWrap: 'wrap',
+                          flexDirection: 'column',
+                          gap: '8px',
                         }}
                       >
-                        <span
-                          style={{ cursor: 'pointer' }}
-                          onClick={() =>
-                            setChannels((prev) => ({ ...prev, push: !prev.push }))
-                          }
-                        >
-                          [{channels.push ? 'x' : ' '}] App Push
-                        </span>
-                        <span
-                          style={{ cursor: 'pointer' }}
-                          onClick={() =>
-                            setChannels((prev) => ({ ...prev, sms: !prev.sms }))
-                          }
-                        >
-                          [{channels.sms ? 'x' : ' '}] Two-Way SMS (No-App Parity)
-                        </span>
-                        <span
-                          style={{ cursor: 'pointer' }}
-                          onClick={() =>
-                            setChannels((prev) => ({ ...prev, email: !prev.email }))
-                          }
-                        >
-                          [{channels.email ? 'x' : ' '}] Email
-                        </span>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={channels.push}
+                            onChange={(e) => setChannels((prev) => ({ ...prev, push: e.target.checked }))}
+                            style={{ accentColor: 'var(--primary)', width: '16px', height: '16px' }}
+                          />
+                          <span>App Push Notification (Smartphone)</span>
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={channels.sms}
+                            onChange={(e) => setChannels((prev) => ({ ...prev, sms: e.target.checked }))}
+                            style={{ accentColor: 'var(--primary)', width: '16px', height: '16px' }}
+                          />
+                          <span>Two-Way SMS Broadcast (Guaranteed Feature Phone Parity)</span>
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={channels.email}
+                            onChange={(e) => setChannels((prev) => ({ ...prev, email: e.target.checked }))}
+                            style={{ accentColor: 'var(--primary)', width: '16px', height: '16px' }}
+                          />
+                          <span>Daily Summary Email Digest</span>
+                        </label>
                       </div>
                     </div>
+
+                    {/* Live SMS Fallback Preview Mockup Box (Iteration 2 Rubric) */}
+                    <div
+                      style={{
+                        padding: '10px 12px',
+                        background: '#f8fafc',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '8px',
+                        marginTop: '8px',
+                      }}
+                    >
+                      <div style={{ fontSize: '10.5px', fontWeight: 800, textTransform: 'uppercase', color: '#64748b', marginBottom: '4px' }}>
+                        📱 Live SMS Fallback Dispatch Preview:
+                      </div>
+                      <div
+                        style={{
+                          background: '#e2e8f0',
+                          padding: '8px 10px',
+                          borderRadius: '6px',
+                          fontFamily: 'monospace',
+                          fontSize: '11px',
+                          color: '#0f172a',
+                          lineHeight: '1.4',
+                        }}
+                      >
+                        [HARTWELL PS] Leo arrived safely at Gate 2 (08:46 AM). Route B Detour verified. Non-smartphone safe check-in complete. Reply STOP to opt out.
+                      </div>
+                    </div>
+
                     <button
                       type="button"
                       className="btn-primary"
@@ -2188,6 +2741,43 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                   </div>
 
                   <div className="settings-list">
+                    <div className="settings-row">
+                      <div className="settings-row-copy">
+                        <strong>Dark mode</strong>
+                        <span>Comfortable low-glare viewing for early mornings and night</span>
+                      </div>
+                      <button
+                        className="settings-switch"
+                        id="darkmode-toggle"
+                        type="button"
+                        role="switch"
+                        aria-label="Dark mode"
+                        aria-checked={darkMode}
+                        onClick={() => {
+                          const next = !darkMode;
+                          setDarkMode(next);
+                          setSrAnnouncement(next ? 'Dark mode enabled' : 'Dark mode disabled');
+                        }}
+                      ></button>
+                    </div>
+                    <div className="settings-row">
+                      <div className="settings-row-copy">
+                        <strong>Colour palette (CASE Tool Scheme)</strong>
+                        <span>{scheme === 'scheme-b' ? 'Scheme B: Eco-Green (AAA Compliant)' : 'Scheme A: Navy (Municipal)'}</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="subnav-tab"
+                        style={{ padding: '4px 10px', fontSize: '11px', fontWeight: 700 }}
+                        onClick={() => {
+                          const next = scheme === 'scheme-b' ? 'scheme-a' : 'scheme-b';
+                          setScheme(next);
+                          setSrAnnouncement(`Swapped to ${next === 'scheme-b' ? 'Scheme B Eco-Green' : 'Scheme A Navy'}`);
+                        }}
+                      >
+                        Swap to {scheme === 'scheme-b' ? 'Scheme A' : 'Scheme B'}
+                      </button>
+                    </div>
                     <div className="settings-row">
                       <div className="settings-row-copy">
                         <strong>High contrast</strong>
@@ -2545,12 +3135,69 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                     </p>
                   </div>
                   <div>
-                    <h4>Active Corridors</h4>
+                    <h4>Active Corridors &bull; Drop-Off Hub Locations</h4>
                     <p>
-                      &bull; <a href="#c1" onClick={(e) => { e.preventDefault(); navigateToScreen('s4'); }}>Toorak / Camberwell Rd</a><br />
-                      &bull; <a href="#c2" onClick={(e) => { e.preventDefault(); navigateToScreen('s5'); }}>Myrtle Park Greenway</a><br />
-                      &bull; <a href="#c3" onClick={(e) => { e.preventDefault(); navigateToScreen('s2'); }}>Fordham Gardens Hub</a><br />
-                      &bull; <a href="#c4" onClick={(e) => { e.preventDefault(); navigateToScreen('s7'); }}>Hartwell Station Hub</a>
+                      &bull;{' '}
+                      <a
+                        href="https://maps.google.com/?q=Toorak+Rd+and+Camberwell+Rd,+Camberwell+VIC+3124"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigateToScreen('s4');
+                          showToast('Opening Corridor C-01: Toorak Rd / Camberwell Rd Google Maps location');
+                        }}
+                        title="View Toorak Rd Crossing on Google Maps"
+                      >
+                        📍 Toorak / Camberwell Rd Crossing
+                      </a>
+                      <br />
+                      &bull;{' '}
+                      <a
+                        href="https://maps.google.com/?q=Myrtle+Park,+Camberwell+VIC+3124"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setMapViewMode('google-maps');
+                          navigateToScreen('s5');
+                          showToast('Opening Hub H-02: Myrtle Park Greenway 500m Hub Google Maps location');
+                        }}
+                        title="View Myrtle Park 500m Hub on Google Maps"
+                      >
+                        📍 Myrtle Park Greenway (500m Hub)
+                      </a>
+                      <br />
+                      &bull;{' '}
+                      <a
+                        href="https://maps.google.com/?q=Fordham+Gardens,+Camberwell+VIC+3124"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigateToScreen('s2');
+                          showToast('Opening Hub H-01: Fordham Gardens 500m Drop-Off Hub Google Maps location');
+                        }}
+                        title="View Fordham Gardens 500m Hub on Google Maps"
+                      >
+                        📍 Fordham Gardens Hub (500m Hub)
+                      </a>
+                      <br />
+                      &bull;{' '}
+                      <a
+                        href="https://maps.google.com/?q=Hartwell+Railway+Station,+Camberwell+VIC+3124"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setMapViewMode('google-maps');
+                          navigateToScreen('s7');
+                          showToast('Opening Hub H-03: Hartwell Station Transit Hub Google Maps location');
+                        }}
+                        title="View Hartwell Station Hub on Google Maps"
+                      >
+                        📍 Hartwell Station Hub
+                      </a>
                     </p>
                   </div>
                   <div>
