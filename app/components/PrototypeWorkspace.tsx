@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button, Chip, Stack, Tooltip } from '@mui/material';
@@ -48,6 +48,47 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
   const [accountDetailsOpen, setAccountDetailsOpen] = useState<boolean>(false);
   const [highContrast, setHighContrast] = useState<boolean>(false);
   const [largeText, setLargeText] = useState<boolean>(false);
+  const [reducedMotion, setReducedMotion] = useState<boolean>(false);
+  const [srAnnouncement, setSrAnnouncement] = useState<string>('');
+  const [notificationsOpen, setNotificationsOpen] = useState<boolean>(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [unreadNotifs, setUnreadNotifs] = useState<number>(3);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [mapViewMode, setMapViewMode] = useState<'corridor' | 'google-maps'>('corridor');
+  const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => {
+      setToastMessage(null);
+    }, 3800);
+  };
+
+  const downloadCouncilAuditCsv = () => {
+    const csvRows = [
+      ['Date', 'Student_ID', 'Student_Name', 'Grade', 'Corridor_Route', 'Hub_Checkin_Location', 'Checkin_Time', 'Distance_Walked_KM', 'Carbon_Saved_KG', 'Supervisor_Staff'],
+      ['2026-11-06', 'STU-1042', 'Leo Mitchell', 'Year 4B', 'Route B (Myrtle Park)', 'Fordham Gardens Hub', '08:41:22', '1.35', '0.28', 'Ms. Lin'],
+      ['2026-11-06', 'STU-1043', 'Sophie Mitchell', 'Year 1A', 'Route A (Toorak Rd)', 'Gate 2 Main Entrance', '08:44:10', '0.85', '0.18', 'Duty Asst. John'],
+      ['2026-11-06', 'STU-1044', 'Oliver Zhang', 'Year 3A', 'Route B (Myrtle Park)', 'Myrtle Park East Hub', '08:38:05', '1.20', '0.25', 'Duty Asst. Sarah'],
+      ['2026-11-06', 'STU-1045', 'Charlotte Brown', 'Year 2B', 'Route C (Hartwell Stn)', 'Hartwell Station Hub', '08:42:50', '1.10', '0.23', 'Ms. Lin'],
+      ['2026-11-06', 'STU-1046', 'Noah Patel', 'Year 3A', 'Route A (Toorak Rd)', 'Toorak Rd Hub', '08:52:15', '0.95', '0.20', 'Duty Asst. John'],
+      ['2026-11-06', 'STU-1047', 'Mia Watson', 'Prep A', 'Route B (Myrtle Park)', 'Fordham Gardens Hub', '08:40:02', '1.35', '0.28', 'Duty Asst. Sarah'],
+      ['2026-11-06', 'STU-1048', 'Lucas Nguyen', 'Year 5C', 'Route C (Hartwell Stn)', 'Hartwell Station Hub', '08:35:18', '1.60', '0.33', 'Kim Le (Admin)'],
+    ];
+    const csvContent = csvRows.map(row => row.map(v => `"${v}"`).join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `hartwell_boroondara_travel_audit_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showToast('📥 Boroondara Council Travel Audit (CSV) downloaded successfully');
+  };
+
   const [logoutModalOpen, setLogoutModalOpen] = useState<boolean>(false);
   const [logoutConfirmed, setLogoutConfirmed] = useState<boolean>(false);
   const [activeUser, setActiveUser] = useState<{
@@ -157,6 +198,16 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
     document.body.setAttribute('data-high-contrast', String(highContrast));
   }, [highContrast]);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setReducedMotion(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.body.setAttribute('data-reduced-motion', String(reducedMotion));
+  }, [reducedMotion]);
+
   // Apply bigger text scaling inside #prototype-viewport
   useEffect(() => {
     document.querySelectorAll<HTMLElement>('#prototype-viewport *').forEach((element) => {
@@ -180,12 +231,14 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
     });
   }, [largeText]);
 
-  // Escape key closes settings and logout modal
+  // Escape key closes settings, notifications, mobile menu, and logout modal
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
       setLogoutModalOpen(false);
       setSettingsOpen(false);
+      setNotificationsOpen(false);
+      setMobileMenuOpen(false);
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
@@ -194,6 +247,8 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
   const navigateToScreen = (screenId: ScreenId, openSosModal = false) => {
     setCurrentScreenId(screenId);
     setSettingsOpen(false);
+    setNotificationsOpen(false);
+    setMobileMenuOpen(false);
     setModalOpen(openSosModal);
 
     // Update browser route cleanly so every screen has a working shareable Next.js route
@@ -245,6 +300,14 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
       data-theme={scheme}
       data-high-contrast={String(highContrast)}
     >
+      {/* WCAG 2.1 A11y Skip Link & Screen Reader Live Region */}
+      <a href="#prototype-viewport" className="skip-to-content">
+        Skip to main school portal content
+      </a>
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {srAnnouncement}
+      </div>
+
       {/* TOP FIGMA / CASE TOOL BAR */}
       <header className="case-toolbar">
         <div className="case-brand">
@@ -253,7 +316,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
           </span>
           <div>
             <div className="case-title">
-              Hartwell Primary School — Sustainable Travel System (S1–S9 | 2-Member Equal Split: 4.5 Screens Each)
+              Hartwell Primary School — Sustainable Travel System <span className="case-motto">• “Strive for the Highest”</span> (S1–S9 | 2-Member Equal Split: 4.5 Screens Each)
             </div>
             <div className="case-subtitle">
               Member A (Sofia Mironenko: S1–S4 + S5 Co-Lead) &amp; Member B (Kim Le: S5 Co-Lead + S6–S9) | Real Site + Figma Prototype
@@ -355,6 +418,21 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
               </Button>
             </Tooltip>
           </Stack>
+
+          <button
+            type="button"
+            className={`tb-btn ${showRubricTags ? 'active' : ''}`}
+            style={{
+              background: showRubricTags ? '#1B5E20' : '#0F172A',
+              color: '#E2E8F0',
+              border: '1px solid #475569',
+              borderRadius: '6px',
+            }}
+            onClick={() => setShowRubricTags((prev) => !prev)}
+            title="Show or hide assignment rubric codes (UC-01..09 / REQ tags) for marking"
+          >
+            {showRubricTags ? '🏷️ Rubric Codes: ON' : '🏷️ Rubric Codes: OFF'}
+          </button>
 
           {/* Viewport Switcher: Auto / Mobile / Desktop / Whiteboard (shown in Figma Canvas mode) */}
           {viewMode === 'figma-canvas' && (
@@ -524,123 +602,320 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                     </span>
                     <div
                       style={{
-                        fontSize: 11,
-                        fontWeight: 700,
-                        letterSpacing: '0.12em',
-                        textTransform: 'uppercase',
-                        color: 'rgba(255,255,255,0.72)',
-                        marginTop: 3,
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: '8px',
+                        marginTop: 4,
                       }}
                     >
-                      Active Morning Commute &bull; {activeUser.name} ({activeUser.roleLabel})
+                      <span className="school-motto">“Strive for the Highest”</span>
+                      <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11 }}>&bull;</span>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 700,
+                          letterSpacing: '0.08em',
+                          textTransform: 'uppercase',
+                          color: 'rgba(255,255,255,0.78)',
+                        }}
+                      >
+                        Signed in: {activeUser.name} ({activeUser.roleLabel})
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 {viewMode === 'real-site' && (
-                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-                    <Button
-                      component={Link}
-                      href="/parent-login"
-                      size="small"
-                      variant="outlined"
-                      sx={{
+                  <div className="header-actions">
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        background: 'rgba(255, 255, 255, 0.12)',
+                        border: '1px solid rgba(255, 255, 255, 0.28)',
+                        padding: '5px 12px',
+                        borderRadius: '20px',
+                        fontSize: '12px',
                         color: '#ffffff',
-                        borderColor: 'rgba(255,255,255,0.35)',
-                        fontSize: 12,
                       }}
                     >
-                      Parent Login
-                    </Button>
-                    <Button
-                      component={Link}
-                      href="/parent-signup"
-                      size="small"
-                      variant="outlined"
-                      sx={{
-                        color: '#ffffff',
-                        borderColor: 'rgba(255,255,255,0.35)',
-                        fontSize: 12,
+                      <span
+                        style={{
+                          width: '22px',
+                          height: '22px',
+                          borderRadius: '50%',
+                          background: '#2f7d4d',
+                          color: '#ffffff',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: 800,
+                          fontSize: '10.5px',
+                        }}
+                      >
+                        {activeUser.initials}
+                      </span>
+                      <span>
+                        <strong>{activeUser.name}</strong> &bull; {activeUser.roleLabel}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="header-btn"
+                      onClick={() => {
+                        setLogoutConfirmed(false);
+                        setLogoutModalOpen(true);
+                      }}
+                      title="End your secure session"
+                    >
+                      Sign Out
+                    </button>
+
+                    <span className="header-divider" aria-hidden="true"></span>
+
+                    <button
+                      type="button"
+                      className={`header-btn ${settingsOpen ? 'active' : ''}`}
+                      aria-controls="settings-panel"
+                      aria-expanded={settingsOpen}
+                      onClick={() => {
+                        setAccountDetailsOpen(false);
+                        setNotificationsOpen(false);
+                        setSettingsOpen((prev) => !prev);
                       }}
                     >
-                      Parent Sign Up
-                    </Button>
-                    <Button
-                      component={Link}
-                      href="/admin-login"
-                      size="small"
-                      variant="contained"
-                      disableElevation
-                      sx={{
-                        bgcolor: '#2f7d4d',
-                        color: '#ffffff',
-                        fontSize: 12,
-                      }}
+                      ⚙️ Settings &amp; A11y
+                    </button>
+
+                    {/* Live Commute Notification Bell Dropdown (Far Upper-Right of Header) */}
+                    <div className="notif-bell-wrap">
+                      <button
+                        type="button"
+                        className="notif-bell-btn"
+                        title="View live commute and school alerts"
+                        aria-label={`${unreadNotifs} unread notifications`}
+                        aria-expanded={notificationsOpen}
+                        onClick={() => {
+                          setSettingsOpen(false);
+                          setNotificationsOpen((prev) => !prev);
+                        }}
+                      >
+                        🔔
+                        {unreadNotifs > 0 && <span className="notif-badge">{unreadNotifs}</span>}
+                      </button>
+                      {notificationsOpen && (
+                        <div className="notification-dropdown">
+                          <div className="notif-header">
+                            <span className="notif-header-title">Live Commute Alerts</span>
+                            {unreadNotifs > 0 && (
+                              <button
+                                type="button"
+                                className="notif-clear-btn"
+                                onClick={() => {
+                                  setUnreadNotifs(0);
+                                  showToast('All alerts marked as read');
+                                }}
+                              >
+                                Mark all as read
+                              </button>
+                            )}
+                          </div>
+                          <div className="notif-list">
+                            <div className="notif-item unread">
+                              <span className="notif-icon">🟢</span>
+                              <div>
+                                <strong>Liam Mitchell</strong> checked in at Fordham Gardens 500m Hub (+50 pts).
+                                <span className="notif-time">08:41 AM &bull; Gate Beacon Active</span>
+                              </div>
+                            </div>
+                            <div className="notif-item unread">
+                              <span className="notif-icon">🌤️</span>
+                              <div>
+                                <strong>BOM Weather Notice:</strong> Camberwell radar clear, 0% rain chance, winds mild 11 km/h S.
+                                <span className="notif-time">08:35 AM &bull; Moorabbin Weather Radar</span>
+                              </div>
+                            </div>
+                            <div className="notif-item unread">
+                              <span className="notif-icon">🚦</span>
+                              <div>
+                                <strong>VicRoads Alert:</strong> 40 km/h school speed zones active &bull; crossing supervisor on duty at Toorak Rd.
+                                <span className="notif-time">08:28 AM &bull; Boroondara Safe Routes</span>
+                              </div>
+                            </div>
+                            <div className="notif-item">
+                              <span className="notif-icon">🚌</span>
+                              <div>
+                                <strong>Walking Bus #2:</strong> Departed Toorak Rd hub with Supervisor John on schedule.
+                                <span className="notif-time">08:18 AM &bull; Group G-04</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    {/* Mobile Hamburger Toggle for iPhone */}
+                    <button
+                      type="button"
+                      className="header-btn mobile-hamburger-btn"
+                      aria-label="Toggle mobile menu"
+                      aria-expanded={mobileMenuOpen}
+                      onClick={() => setMobileMenuOpen((o) => !o)}
                     >
-                      Staff / Admin Login
-                    </Button>
-                  </Stack>
+                      <span className="hamburger-icon" aria-hidden="true">
+                        {mobileMenuOpen ? '✕' : '☰'}
+                      </span>
+                    </button>
+                  </div>
                 )}
               </div>
               <div className="screen-subtitle-bar"></div>
             </div>
 
+            {/* Mobile Drawer Navigation for iPhone (Real-Site Mode) */}
+            {viewMode === 'real-site' && mobileMenuOpen && (
+              <div className="mobile-drawer-overlay" onClick={() => setMobileMenuOpen(false)}>
+                <nav
+                  className="mobile-drawer-sheet"
+                  aria-label="Mobile site navigation"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="mobile-drawer-head">
+                    <div>
+                      <div style={{ fontSize: '11px', textTransform: 'uppercase', color: '#53a36e', fontWeight: 800 }}>
+                        Navigation &bull; {activeUser.roleLabel}
+                      </div>
+                      <div style={{ fontSize: '14px', fontWeight: 800, color: '#ffffff' }}>
+                        {activeUser.name}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className="mobile-drawer-close"
+                      aria-label="Close mobile menu"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div className="mobile-drawer-links">
+                    {ALL_SCREEN_IDS.filter((id) => {
+                      if (showRubricTags) return true;
+                      const role = activeUser.roleLabel.toLowerCase();
+                      if (role.includes('parent')) return ['s7', 's4', 's8'].includes(id);
+                      if (role.includes('teacher')) return ['s8', 's1', 's2', 's3', 's4', 's5'].includes(id);
+                      return ['s6', 's2', 's3', 's4', 's5', 's8', 's9'].includes(id);
+                    }).map((id) => {
+                      const active = currentScreenId === id;
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          className={`mobile-nav-link ${active ? 'active' : ''}`}
+                          onClick={() => {
+                            navigateToScreen(id);
+                            setMobileMenuOpen(false);
+                          }}
+                        >
+                          <span>{REAL_SITE_TITLES[id]}</span>
+                          <span style={{ fontSize: '11px', opacity: 0.7 }}>{SCREEN_META[id]?.reqBadge} &rsaquo;</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="mobile-drawer-footer">
+                    <button
+                      type="button"
+                      className="header-btn"
+                      style={{ width: '100%', justifyContent: 'center' }}
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setSettingsOpen(true);
+                      }}
+                    >
+                      ⚙️ Settings &amp; A11y
+                    </button>
+                    <button
+                      type="button"
+                      className="header-btn"
+                      style={{ width: '100%', justifyContent: 'center', marginTop: '8px', color: '#f87171' }}
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setLogoutConfirmed(false);
+                        setLogoutModalOpen(true);
+                      }}
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                </nav>
+              </div>
+            )}
+
+            {/* Real-Site Live BOM Weather & VicRoads Status Strip */}
+            {viewMode === 'real-site' && (
+              <div className="commute-status-strip">
+                <div className="status-strip-item">
+                  <span className="strip-badge bom-badge">BOM Live</span>
+                  <span>🌤️ 16.4°C Camberwell &bull; Rain 0% &bull; Wind 11 km/h S</span>
+                </div>
+                <div className="status-strip-item">
+                  <span className="strip-badge vicroads-badge">VicRoads</span>
+                  <span>🚦 40 km/h School Zones Active &bull; Toorak Rd Clear</span>
+                </div>
+                <div className="status-strip-item">
+                  <span className="live-dot" aria-hidden="true"></span>
+                  <span>Supervision Window: 08:00–09:15 AM &bull; SLA 0.38s Sync</span>
+                </div>
+              </div>
+            )}
+
             {/* Real-Site Horizontal Portal Subnav + Editorial Hero Header */}
             {viewMode === 'real-site' && (
               <>
                 <nav className="real-site-subnav" aria-label="Portal sections">
-                  <Stack direction="row" spacing={0.75} sx={{ flexWrap: 'wrap', gap: 0.75 }}>
-                    {ALL_SCREEN_IDS.map((id) => {
-                      const active = currentScreenId === id;
-                      return (
-                        <Button
-                          key={id}
-                          size="small"
-                          variant={active ? 'contained' : 'outlined'}
-                          color="primary"
-                          disableElevation
-                          onClick={() => navigateToScreen(id)}
-                          sx={{
-                            fontSize: 12,
-                            py: 0.6,
-                            px: 1.5,
-                            borderRadius: 2.5,
-                            borderColor: active ? '#123e2b' : '#cbd7cf',
-                            bgcolor: active ? '#123e2b' : '#ffffff',
-                            color: active ? '#ffffff' : '#17221c',
-                          }}
-                        >
-                          {REAL_SITE_TITLES[id]}
-                        </Button>
-                      );
-                    })}
-                  </Stack>
-                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-                    <Tooltip
-                      title={
-                        showRubricTags
-                          ? 'Hide assignment codes (UC-01..09 / REQ tags) for clean stakeholder view'
-                          : 'Show assignment codes (UC-01..09 / REQ tags) for marking & traceability'
-                      }
-                    >
-                      <Button
-                        size="small"
-                        variant={showRubricTags ? 'contained' : 'outlined'}
-                        color="secondary"
-                        onClick={() => setShowRubricTags((prev) => !prev)}
-                        sx={{
-                          fontSize: 11,
-                          py: 0.4,
-                          px: 1.25,
-                          borderRadius: 2,
-                          bgcolor: showRubricTags ? '#e9f4ec' : 'transparent',
-                          color: '#123e2b',
-                          borderColor: '#b9d8c1',
+                  {ALL_SCREEN_IDS.filter((id) => {
+                    // If user enabled rubric tags or is in figma mode, allow all screens
+                    if (showRubricTags) return true;
+                    // Filter by role: parent gets S7, S4, S8; teacher gets S8, S1-S5; admin gets S6, S2-S6, S8, S9
+                    const role = activeUser.roleLabel.toLowerCase();
+                    if (role.includes('parent')) {
+                      return ['s7', 's4', 's8'].includes(id);
+                    }
+                    if (role.includes('teacher')) {
+                      return ['s8', 's1', 's2', 's3', 's4', 's5'].includes(id);
+                    }
+                    // Admin/Operations
+                    return ['s6', 's2', 's3', 's4', 's5', 's8', 's9'].includes(id);
+                  }).map((id) => {
+                    const active = currentScreenId === id;
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        className={`subnav-tab ${active ? 'active' : ''}`}
+                        aria-current={active ? 'page' : undefined}
+                        onClick={() => {
+                          navigateToScreen(id);
+                          setSrAnnouncement(`Navigated to ${REAL_SITE_TITLES[id]}`);
                         }}
                       >
-                        {showRubricTags ? '🏷️ Rubric Codes: Visible' : '🏷️ Rubric Codes: Hidden'}
-                      </Button>
-                    </Tooltip>
+                        {REAL_SITE_TITLES[id]}
+                      </button>
+                    );
+                  })}
+                </nav>
+
+                <div className="real-site-hero-bar">
+                  <div>
+                    <div className="real-site-kicker">
+                      <span>Boroondara Safe Routes &bull; {meta.personaLabel}</span>
+                    </div>
+                    <h1 className="real-site-heading">{REAL_SITE_TITLES[currentScreenId]}</h1>
+                  </div>
+                  {showRubricTags && (
                     <Chip
                       label={`${meta.code} • ${meta.owner}`}
                       size="small"
@@ -648,30 +923,12 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                         bgcolor: '#e9f4ec',
                         color: '#123e2b',
                         fontWeight: 800,
-                        fontSize: 11,
+                        fontSize: 11.5,
+                        px: 1,
                         border: '1px solid #b9d8c1',
                       }}
                     />
-                  </Stack>
-                </nav>
-
-                <div className="real-site-hero-bar">
-                  <div>
-                    <div className="real-site-kicker">
-                      <span className="live-dot" aria-hidden="true"></span>
-                      <span>Active Morning Commute Window (08:00–09:00 AM)</span>
-                    </div>
-                    <h1 className="real-site-heading">{REAL_SITE_TITLES[currentScreenId]}</h1>
-                  </div>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    color="primary"
-                    onClick={() => updateViewMode('figma-canvas')}
-                    sx={{ fontSize: 12 }}
-                  >
-                    Switch to Figma Device Frame &rarr;
-                  </Button>
+                  )}
                 </div>
               </>
             )}
@@ -1175,6 +1432,67 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                       Co-integrated by Sofia M. (S4 Hazard Trigger &amp; Constrained Dropdown Fix)
                       and Member B (S7 Parent Broadcast Link).
                     </p>
+                    <div className="map-view-header">
+                      <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--primary)' }}>
+                        Detour Corridor Preview
+                      </span>
+                      <div className="map-toggle-group" role="group" aria-label="Select detour map view">
+                        <button
+                          type="button"
+                          className={`map-toggle-btn ${mapViewMode === 'corridor' ? 'active' : ''}`}
+                          onClick={() => setMapViewMode('corridor')}
+                        >
+                          🗺️ Safe Corridor
+                        </button>
+                        <button
+                          type="button"
+                          className={`map-toggle-btn ${mapViewMode === 'google-maps' ? 'active' : ''}`}
+                          onClick={() => {
+                            setMapViewMode('google-maps');
+                            showToast('Loaded Google Maps detour preview for Myrtle Park');
+                          }}
+                        >
+                          📍 Google Maps API
+                        </button>
+                      </div>
+                    </div>
+                    {mapViewMode === 'google-maps' ? (
+                      <div className="google-maps-frame" style={{ marginBottom: '12px' }}>
+                        <span className="maps-layer-badge">
+                          🟢 Route B: Myrtle Park Greenway Detour
+                        </span>
+                        <iframe
+                          title="Google Maps — Myrtle Park Greenway Safe Detour"
+                          width="100%"
+                          height="200"
+                          style={{ border: 0, display: 'block' }}
+                          loading="lazy"
+                          allowFullScreen
+                          referrerPolicy="no-referrer-when-downgrade"
+                          src="https://maps.google.com/maps?q=Myrtle+Park,+Camberwell+VIC+3124&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                        />
+                      </div>
+                    ) : (
+                      <div className="map-box" style={{ marginBottom: '12px', height: '120px' }}>
+                        <div className="map-corridor-line"></div>
+                        <span className="map-pin">
+                          {selectedAlternateRoute.split('(')[0].trim()}
+                        </span>
+                        <div
+                          style={{
+                            background: 'rgba(255,255,255,0.94)',
+                            padding: '5px 8px',
+                            borderRadius: '6px',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            color: '#111827',
+                            zIndex: 2,
+                          }}
+                        >
+                          Sheltered footpath • Crossing Supervisor notified
+                        </div>
+                      </div>
+                    )}
                     <button
                       type="button"
                       className="btn-primary"
@@ -1262,6 +1580,14 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                         <div className="metric-lbl">Arrived Safe</div>
                       </div>
                     </div>
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      style={{ marginTop: '14px', width: '100%', background: '#0a2b1d' }}
+                      onClick={downloadCouncilAuditCsv}
+                    >
+                      📥 Download Boroondara Council Travel Audit (CSV)
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1286,6 +1612,33 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                       </span>
                       <span className="req-pill">UC-07 | REQ-PAR-01</span>
                     </div>
+                    <div className="sibling-pills" role="radiogroup" aria-label="Select student sibling">
+                      <button
+                        type="button"
+                        role="radio"
+                        aria-checked={selectedChild.startsWith('Leo')}
+                        className={`sibling-pill-btn ${selectedChild.startsWith('Leo') ? 'active' : ''}`}
+                        onClick={() => {
+                          setSelectedChild('Leo Mitchell (Year 4B) — Active on Route B Detour');
+                          showToast('Viewing live transit for Leo Mitchell (Year 4B)');
+                        }}
+                      >
+                        🎒 Leo Mitchell (Yr 4B)
+                      </button>
+                      <button
+                        type="button"
+                        role="radio"
+                        aria-checked={selectedChild.startsWith('Sophie')}
+                        className={`sibling-pill-btn ${selectedChild.startsWith('Sophie') ? 'active' : ''}`}
+                        onClick={() => {
+                          setSelectedChild('Sophie Mitchell (Year 1A) — Arrived Gate 2 (08:44 AM)');
+                          showToast('Viewing arrival record for Sophie Mitchell (Yr 1A)');
+                        }}
+                      >
+                        👧 Sophie Mitchell (Yr 1A)
+                      </button>
+                    </div>
+
                     <div className="form-group">
                       <label className="form-label">
                         <span>Enrolled Child Selector (1..* Multiplicity)</span>
@@ -1301,25 +1654,68 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                       </select>
                     </div>
 
-                    <div className="map-box">
-                      <div className="map-corridor-line"></div>
-                      <span className="map-pin">
-                        Inside 500m Safe Corridor — Myrtle Park Greenway
+                    <div className="map-view-header">
+                      <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--primary)' }}>
+                        Live Safe Route Transit Map
                       </span>
-                      <div
-                        style={{
-                          background: 'rgba(255,255,255,0.94)',
-                          padding: '6px 9px',
-                          borderRadius: '6px',
-                          fontSize: '11px',
-                          fontWeight: 700,
-                          color: '#111827',
-                          zIndex: 2,
-                        }}
-                      >
-                        CR-01 Detour Active: Diverted from Toorak Rd Squall (+4 mins)
+                      <div className="map-toggle-group" role="group" aria-label="Select map view">
+                        <button
+                          type="button"
+                          className={`map-toggle-btn ${mapViewMode === 'corridor' ? 'active' : ''}`}
+                          onClick={() => setMapViewMode('corridor')}
+                        >
+                          🗺️ Safe Corridor
+                        </button>
+                        <button
+                          type="button"
+                          className={`map-toggle-btn ${mapViewMode === 'google-maps' ? 'active' : ''}`}
+                          onClick={() => {
+                            setMapViewMode('google-maps');
+                            showToast('Loaded interactive Google Maps for Hartwell PS');
+                          }}
+                        >
+                          📍 Google Maps API
+                        </button>
                       </div>
                     </div>
+
+                    {mapViewMode === 'google-maps' ? (
+                      <div className="google-maps-frame">
+                        <span className="maps-layer-badge">
+                          🟢 VicRoads &amp; Council Safe Route Layer Active
+                        </span>
+                        <iframe
+                          title="Google Maps — Hartwell Primary School Safe Travel Corridors"
+                          width="100%"
+                          height="280"
+                          style={{ border: 0, display: 'block' }}
+                          loading="lazy"
+                          allowFullScreen
+                          referrerPolicy="no-referrer-when-downgrade"
+                          src="https://maps.google.com/maps?q=Hartwell+Primary+School,+Milverton+Street,+Camberwell+VIC+3124&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                        />
+                      </div>
+                    ) : (
+                      <div className="map-box">
+                        <div className="map-corridor-line"></div>
+                        <span className="map-pin">
+                          Inside 500m Safe Corridor — Myrtle Park Greenway
+                        </span>
+                        <div
+                          style={{
+                            background: 'rgba(255,255,255,0.94)',
+                            padding: '6px 9px',
+                            borderRadius: '6px',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            color: '#111827',
+                            zIndex: 2,
+                          }}
+                        >
+                          CR-01 Detour Active: Diverted from Toorak Rd Squall (+4 mins)
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="card">
@@ -1650,6 +2046,14 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                         </span>
                       </div>
                     </div>
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      style={{ marginTop: '14px', width: '100%', background: '#0a2b1d' }}
+                      onClick={downloadCouncilAuditCsv}
+                    >
+                      📥 Export Anonymised Boroondara Council Audit (CSV)
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1711,14 +2115,18 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="settings-title"
+                aria-describedby="settings-desc"
               >
+                <p id="settings-desc" className="sr-only">
+                  Configure accessibility preferences, high contrast, text enlargement, reduced motion, notification channels, and active profile.
+                </p>
                 <div
                   id="settings-main"
                   style={{ display: accountDetailsOpen ? 'none' : undefined }}
                 >
                   <div className="settings-header">
                     <div>
-                      <div className="settings-kicker">Preferences</div>
+                      <div className="settings-kicker">Preferences &amp; Accessibility</div>
                       <h2 className="settings-title" id="settings-title">
                         Settings
                       </h2>
@@ -1733,13 +2141,49 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                     </button>
                   </div>
 
-                  <div className="account-summary">
-                    <div className="account-avatar" aria-hidden="true">
-                      {activeUser.initials}
+                  <div className="account-summary" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '11px' }}>
+                      <div className="account-avatar" aria-hidden="true">
+                        {activeUser.initials}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div className="account-summary-name">{activeUser.name}</div>
+                        <div className="account-summary-role">{activeUser.roleLabel} &bull; {activeUser.email}</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="account-summary-name">{activeUser.name}</div>
-                      <div className="account-summary-role">{activeUser.roleLabel}</div>
+                    <div style={{ marginTop: '6px', paddingTop: '8px', borderTop: '1px solid var(--border-color)' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '6px' }}>
+                        Quick Switch Persona:
+                      </div>
+                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                        {(['parent', 'teacher', 'admin'] as const).map((roleKey) => {
+                          const acc = DEMO_ACCOUNTS[roleKey];
+                          const isCurrent = activeUser.email === acc.email;
+                          return (
+                            <button
+                              key={roleKey}
+                              type="button"
+                              onClick={() => {
+                                switchDemoPersona(acc);
+                                setSrAnnouncement(`Switched demo persona to ${acc.name}, ${acc.roleLabel}`);
+                              }}
+                              style={{
+                                padding: '4px 10px',
+                                fontSize: '11px',
+                                fontWeight: 700,
+                                borderRadius: '6px',
+                                border: '1px solid var(--border-color)',
+                                background: isCurrent ? 'var(--primary)' : 'var(--bg-card)',
+                                color: isCurrent ? '#ffffff' : 'var(--text-main)',
+                                cursor: 'pointer',
+                              }}
+                              aria-pressed={isCurrent}
+                            >
+                              {acc.name} ({roleKey === 'parent' ? 'Parent' : roleKey === 'teacher' ? 'Teacher' : 'Admin'})
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
 
@@ -1747,39 +2191,124 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                     <div className="settings-row">
                       <div className="settings-row-copy">
                         <strong>High contrast</strong>
-                        <span>Increase colour and border contrast</span>
+                        <span>Increase colour, focus ring, and border contrast</span>
                       </div>
                       <button
                         className="settings-switch"
                         id="contrast-toggle"
                         type="button"
-                        aria-label="High contrast"
-                        aria-pressed={highContrast}
-                        onClick={() => setHighContrast((prev) => !prev)}
+                        role="switch"
+                        aria-label="High contrast mode"
+                        aria-checked={highContrast}
+                        onClick={() => {
+                          const next = !highContrast;
+                          setHighContrast(next);
+                          setSrAnnouncement(next ? 'High contrast mode enabled' : 'High contrast mode disabled');
+                        }}
                       ></button>
                     </div>
                     <div className="settings-row">
                       <div className="settings-row-copy">
                         <strong>Bigger text</strong>
-                        <span>Enlarge text across the app</span>
+                        <span>Enlarge text across the school portal</span>
                       </div>
                       <button
                         className="settings-switch"
                         id="text-size-toggle"
                         type="button"
-                        aria-label="Bigger text"
-                        aria-pressed={largeText}
-                        onClick={() => setLargeText((prev) => !prev)}
+                        role="switch"
+                        aria-label="Bigger text scaling"
+                        aria-checked={largeText}
+                        onClick={() => {
+                          const next = !largeText;
+                          setLargeText(next);
+                          setSrAnnouncement(next ? 'Bigger text scaling enabled' : 'Bigger text scaling disabled');
+                        }}
                       ></button>
                     </div>
+                    <div className="settings-row">
+                      <div className="settings-row-copy">
+                        <strong>Reduce motion</strong>
+                        <span>Disable animations and pulsing commute badge</span>
+                      </div>
+                      <button
+                        className="settings-switch"
+                        id="motion-toggle"
+                        type="button"
+                        role="switch"
+                        aria-label="Reduce motion"
+                        aria-checked={reducedMotion}
+                        onClick={() => {
+                          const next = !reducedMotion;
+                          setReducedMotion(next);
+                          setSrAnnouncement(next ? 'Reduced motion enabled' : 'Reduced motion disabled');
+                        }}
+                      ></button>
+                    </div>
+                    <div className="settings-row">
+                      <div className="settings-row-copy">
+                        <strong>Rubric &amp; assignment codes</strong>
+                        <span>Show UC-01..09 and REQ tags for marking</span>
+                      </div>
+                      <button
+                        className="settings-switch"
+                        id="rubric-toggle"
+                        type="button"
+                        role="switch"
+                        aria-label="Rubric and assignment requirement tags"
+                        aria-checked={showRubricTags}
+                        onClick={() => {
+                          const next = !showRubricTags;
+                          setShowRubricTags(next);
+                          setSrAnnouncement(next ? 'Assignment requirement tags visible' : 'Assignment requirement tags hidden');
+                        }}
+                      ></button>
+                    </div>
+
+                    <div className="settings-section-divider">
+                      <span>Travel Alerts &amp; Notification Channels</span>
+                    </div>
+
+                    <div className="settings-row">
+                      <div className="settings-row-copy">
+                        <strong>Push notifications</strong>
+                        <span>Real-time bus arrival &amp; geo-hub alerts</span>
+                      </div>
+                      <button
+                        className="settings-switch"
+                        id="push-toggle"
+                        type="button"
+                        role="switch"
+                        aria-label="Push notifications"
+                        aria-checked={channels.push}
+                        onClick={() => setChannels(c => ({ ...c, push: !c.push }))}
+                      ></button>
+                    </div>
+                    <div className="settings-row">
+                      <div className="settings-row-copy">
+                        <strong>SMS notifications</strong>
+                        <span>Emergency weather reroute &amp; dispatch SMS</span>
+                      </div>
+                      <button
+                        className="settings-switch"
+                        id="sms-toggle"
+                        type="button"
+                        role="switch"
+                        aria-label="SMS notifications"
+                        aria-checked={channels.sms}
+                        onClick={() => setChannels(c => ({ ...c, sms: !c.sms }))}
+                      ></button>
+                    </div>
+
                     <button
                       className="settings-row"
                       type="button"
+                      aria-haspopup="dialog"
                       onClick={() => setAccountDetailsOpen(true)}
                     >
                       <span className="settings-row-copy">
-                        <strong>Account</strong>
-                        <span>View your profile and access level</span>
+                        <strong>Account profile</strong>
+                        <span>View your verified role and access permissions</span>
                       </span>
                       <span className="settings-chevron" aria-hidden="true">
                         &rsaquo;
@@ -1788,6 +2317,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                     <button
                       className="settings-row settings-logout"
                       type="button"
+                      aria-haspopup="dialog"
                       onClick={() => {
                         setLogoutConfirmed(false);
                         setLogoutModalOpen(true);
@@ -1894,12 +2424,13 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
             </div>
 
             {/* Persistent 6-Tab Bottom Navigation Bar */}
-            <nav className="bottom-nav">
+            <nav className="bottom-nav" aria-label="Mobile and quick navigation">
               <Link
                 href="/s1"
                 className={`tab-btn ${
                   !settingsOpen && ['s1', 's2', 's3'].includes(currentScreenId) ? 'active' : ''
                 }`}
+                aria-current={!settingsOpen && ['s1', 's2', 's3'].includes(currentScreenId) ? 'page' : undefined}
                 id="tab-home"
                 onClick={(e) => {
                   e.preventDefault();
@@ -1914,6 +2445,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                 className={`tab-btn ${
                   !settingsOpen && currentScreenId === 's4' ? 'active' : ''
                 }`}
+                aria-current={!settingsOpen && currentScreenId === 's4' ? 'page' : undefined}
                 id="tab-weather"
                 onClick={(e) => {
                   e.preventDefault();
@@ -1928,6 +2460,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                 className={`tab-btn ${
                   !settingsOpen && currentScreenId === 's5' ? 'active' : ''
                 }`}
+                aria-current={!settingsOpen && currentScreenId === 's5' ? 'page' : undefined}
                 id="tab-reroute"
                 onClick={(e) => {
                   e.preventDefault();
@@ -1942,6 +2475,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                 className={`tab-btn ${
                   !settingsOpen && ['s6', 's7'].includes(currentScreenId) ? 'active' : ''
                 }`}
+                aria-current={!settingsOpen && ['s6', 's7'].includes(currentScreenId) ? 'page' : undefined}
                 id="tab-parent"
                 onClick={(e) => {
                   e.preventDefault();
@@ -1956,6 +2490,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                 className={`tab-btn ${
                   !settingsOpen && ['s8', 's9'].includes(currentScreenId) ? 'active' : ''
                 }`}
+                aria-current={!settingsOpen && ['s8', 's9'].includes(currentScreenId) ? 'page' : undefined}
                 id="tab-privacy"
                 onClick={(e) => {
                   e.preventDefault();
@@ -1971,6 +2506,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                 type="button"
                 aria-controls="settings-panel"
                 aria-expanded={settingsOpen}
+                aria-label="Settings and accessibility preferences"
                 onClick={() => {
                   if (settingsOpen) {
                     setSettingsOpen(false);
@@ -1994,6 +2530,9 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                 <div className="real-site-footer-inner">
                   <div>
                     <h4>Hartwell Primary School — Sustainable Travel Portal</h4>
+                    <p style={{ fontStyle: 'italic', color: '#86efac', fontSize: 13, margin: '2px 0 8px', fontWeight: 600 }}>
+                      Motto: “Strive for the Highest” &bull; Established 1922
+                    </p>
                     <p>
                       Supporting active, safe, and sustainable walking school buses and active travel
                       for students and families across Camberwell and Boroondara.
@@ -2025,10 +2564,26 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                   </div>
                 </div>
                 <div className="real-site-footer-bottom">
-                  <span>&copy; 2026 Hartwell Primary School. Department of Education Victoria.</span>
+                  <span>&copy; 2026 Hartwell Primary School &bull; “Strive for the Highest” &bull; Department of Education Victoria.</span>
                   <span>System Status: 🟢 All Corridors Operating Normal &bull; SLA 0.38s Cloud Sync</span>
                 </div>
               </footer>
+            )}
+
+            {/* Real-Site Interactive Action Toast Alert */}
+            {toastMessage && (
+              <div className="action-toast" role="status" aria-live="polite">
+                <span className="toast-icon">✓</span>
+                <span className="toast-text">{toastMessage}</span>
+                <button
+                  type="button"
+                  className="toast-close"
+                  onClick={() => setToastMessage(null)}
+                  aria-label="Dismiss notification"
+                >
+                  &times;
+                </button>
+              </div>
             )}
           </div>
         </main>

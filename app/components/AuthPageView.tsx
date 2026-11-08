@@ -3,16 +3,7 @@
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import {
-  Alert,
-  Box,
-  Button,
-  Chip,
-  Paper,
-  Stack,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Alert } from '@mui/material';
 import '../auth.css';
 
 export type AuthVariant = 'parent-login' | 'parent-signup' | 'admin-login';
@@ -141,128 +132,29 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
   };
 
   const renderDemoCard = (accounts: DemoAccount[], title: string) => (
-    <Paper
-      elevation={0}
-      aria-label={title}
-      sx={{
-        mb: 3,
-        p: 2,
-        borderRadius: 3,
-        border: '1px solid #b9d8c1',
-         bgcolor: '#e9f4ec',
-      }}
-    >
-      <Stack
-        direction="row"
-        spacing={1}
-        sx={{
-          mb: 1.5,
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: 0.5,
-        }}
-      >
-        <Typography
-          sx={{
-            color: '#123e2b',
-            fontSize: 11,
-            fontWeight: 800,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-          }}
-        >
-          {title}
-        </Typography>
-        <Chip
-          label="MUI Stakeholder Demo Ready"
-          size="small"
-          sx={{
-            height: 22,
-            fontSize: 10.5,
-            fontWeight: 800,
-            bgcolor: '#123e2b',
-            color: '#ffffff',
-          }}
-        />
-      </Stack>
-
-      <Stack spacing={1.25}>
+    <details className="test-credentials-disclosure">
+      <summary>{title}</summary>
+      <div className="test-accounts-grid">
         {accounts.map((acc) => (
-          <Paper
-            key={acc.id}
-            elevation={0}
-            sx={{
-              p: 1.5,
-              borderRadius: 2.5,
-              border: '1px solid #cbd7cf',
-              bgcolor: '#ffffff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: 1.25,
-            }}
-          >
-            <Box sx={{ minWidth: 180 }}>
-              <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-                <Typography sx={{ fontSize: 13, fontWeight: 800, color: '#123e2b' }}>
-                  {acc.name}
-                </Typography>
-                <Chip
-                  label={acc.roleLabel}
-                  size="small"
-                  variant="outlined"
-                  sx={{
-                    height: 20,
-                    fontSize: 10.5,
-                    fontWeight: 700,
-                    borderColor: '#2f7d4d',
-                    color: '#123e2b',
-                  }}
-                />
-              </Stack>
-              <Typography
-                sx={{
-                  fontSize: 11.5,
-                  color: '#647069',
-                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-                  mt: 0.35,
-                }}
-              >
+          <div key={acc.id} className="test-account-row">
+            <div>
+              <strong style={{ color: '#123e2b' }}>{acc.name}</strong> ({acc.roleLabel})
+              <div style={{ fontFamily: 'monospace', fontSize: '11px', color: '#647069' }}>
                 {acc.email} &bull; {acc.password}
-              </Typography>
-            </Box>
-
-            <Stack direction="row" spacing={1}>
-              <Tooltip title="Populate form fields with this demo persona">
-                <Button
-                  size="small"
-                  variant="outlined"
-                  color="primary"
-                  onClick={() => loginWithDemo(acc, false)}
-                  sx={{ fontSize: 12, py: 0.5, px: 1.25 }}
-                >
-                  Auto-fill
-                </Button>
-              </Tooltip>
-              <Tooltip title={`Sign in immediately and open ${acc.targetTitle}`}>
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="primary"
-                  disableElevation
-                  onClick={() => loginWithDemo(acc, true)}
-                  sx={{ fontSize: 12, py: 0.5, px: 1.5 }}
-                >
-                  Launch {acc.targetRoute.toUpperCase()} &rarr;
-                </Button>
-              </Tooltip>
-            </Stack>
-          </Paper>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="subnav-tab"
+              style={{ padding: '4px 10px', fontSize: '11px' }}
+              onClick={() => loginWithDemo(acc, false)}
+            >
+              Fill
+            </button>
+          </div>
         ))}
-      </Stack>
-    </Paper>
+      </div>
+    </details>
   );
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -342,6 +234,7 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
             <span className="brand-mark" aria-hidden="true"></span>
             <span className="brand-copy">
               <strong>Hartwell Primary School</strong>
+              <span className="brand-motto">“Strive for the Highest”</span>
               <span>Sustainable Travel Portal</span>
             </span>
           </Link>
@@ -426,12 +319,17 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
 
             <nav className="access-switch" aria-label="Choose access type">
               <Link href="/parent-login" aria-current="page">
-                Parent access
+                Parent &amp; Carer
               </Link>
-              <Link href="/admin-login">Staff &amp; admin</Link>
+              <Link href="/admin-login?role=teacher">
+                Teacher &amp; Duty
+              </Link>
+              <Link href="/admin-login?role=admin">
+                School Admin
+              </Link>
             </nav>
 
-            {renderDemoCard([DEMO_ACCOUNTS.parent], 'Quick-Fill Parent Demo Account')}
+            {renderDemoCard([DEMO_ACCOUNTS.parent], 'Evaluation Credentials: Sarah Mitchell (Parent)')}
 
             <form ref={formRef} data-auth-form onSubmit={handleSubmit} noValidate>
               <div className="field">
@@ -518,6 +416,7 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
             <span className="brand-mark" aria-hidden="true"></span>
             <span className="brand-copy">
               <strong>Hartwell Primary School</strong>
+              <span className="brand-motto">“Strive for the Highest”</span>
               <span>Sustainable Travel Portal</span>
             </span>
           </Link>
@@ -758,6 +657,7 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
           <span className="brand-mark" aria-hidden="true"></span>
           <span className="brand-copy">
             <strong>Hartwell Primary School</strong>
+            <span className="brand-motto">“Strive for the Highest”</span>
             <span>Staff Operations Portal</span>
           </span>
         </Link>
@@ -836,15 +736,20 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
 
         <div className="form-wrap">
           <p className="form-kicker">Staff operations</p>
-          <h2 id="login-title">Admin &amp; staff login</h2>
+          <h2 id="login-title">Staff &amp; Operations Login</h2>
           <p className="form-intro">
-            Use your Hartwell Primary School staff credentials to continue.
+            Use your official Hartwell Primary School credentials to access active duty and administrative tools.
           </p>
 
           <nav className="access-switch" aria-label="Choose access type">
-            <Link href="/parent-login">Parent access</Link>
-            <Link href="/admin-login" aria-current="page">
-              Staff &amp; admin
+            <Link href="/parent-login">
+              Parent &amp; Carer
+            </Link>
+            <Link href="/admin-login?role=teacher" aria-current="page">
+              Teacher &amp; Duty
+            </Link>
+            <Link href="/admin-login?role=admin">
+              School Admin
             </Link>
           </nav>
 
@@ -867,7 +772,7 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
 
           {renderDemoCard(
             [DEMO_ACCOUNTS.teacher, DEMO_ACCOUNTS.admin],
-            'Quick-Fill Staff Demo Accounts (Teacher & Admin)'
+            'Evaluation Credentials: Staff Accounts (Teacher & Admin)'
           )}
 
           <form ref={formRef} data-auth-form onSubmit={handleSubmit} noValidate>

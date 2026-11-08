@@ -128,6 +128,16 @@
   text-transform: uppercase;
 }
 
+.auth-shell .brand-copy .brand-motto {
+  margin-top: 2px;
+  color: #86efac;
+  font-size: 12px;
+  font-weight: 600;
+  font-style: italic;
+  letter-spacing: 0.03em;
+  text-transform: none;
+}
+
 .auth-shell .story-content {
   position: relative;
   z-index: 1;
@@ -296,9 +306,9 @@
 
 .auth-shell .access-switch {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 5px;
-  margin-bottom: 30px;
+  margin-bottom: 24px;
   padding: 5px;
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -306,13 +316,55 @@
 }
 
 .auth-shell .access-switch a {
-  padding: 11px 14px;
+  padding: 10px 8px;
   border-radius: 10px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   text-align: center;
   text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.auth-shell .access-switch a[aria-current="page"] {
+  color: var(--forest);
+  background: var(--white);
+  box-shadow: 0 3px 12px rgba(10, 43, 29, 0.09);
+}
+
+.auth-shell .test-credentials-disclosure {
+  margin-top: 24px;
+  padding: 12px 16px;
+  background: #f1f5f3;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.auth-shell .test-credentials-disclosure summary {
+  font-weight: 700;
+  color: var(--leaf);
+  cursor: pointer;
+  user-select: none;
+}
+
+.auth-shell .test-accounts-grid {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.auth-shell .test-account-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
 }
 
 .auth-shell .access-switch a[aria-current="page"] {

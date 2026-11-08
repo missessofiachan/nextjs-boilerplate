@@ -135,6 +135,16 @@ a {
   text-transform: uppercase;
 }
 
+.brand-copy .brand-motto {
+  margin-top: 2px;
+  color: #86efac;
+  font-size: 12px;
+  font-weight: 600;
+  font-style: italic;
+  letter-spacing: 0.03em;
+  text-transform: none;
+}
+
 .story-content {
   position: relative;
   z-index: 1;
