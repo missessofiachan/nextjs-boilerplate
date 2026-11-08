@@ -4,6 +4,7 @@ import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Alert } from '@mui/material';
+import { setDemoSessionAction } from '../actions/auth';
 import '../auth.css';
 
 export type AuthVariant = 'parent-login' | 'parent-signup' | 'admin-login';
@@ -124,6 +125,7 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
       } catch {
         // ignore storage errors
       }
+      void setDemoSessionAction(account);
       setStatusMessage(
         `Signed in as ${account.name} (${account.roleLabel}). Opening ${account.targetTitle}...`
       );
@@ -221,6 +223,7 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
     } catch {
       // ignore storage errors
     }
+    void setDemoSessionAction(activeDemo);
 
     setStatusMessage(
       `Signed in as ${activeDemo.name} (${activeDemo.roleLabel}). Redirecting to ${activeDemo.targetTitle}...`
@@ -350,8 +353,8 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
                     name="email"
                     type="email"
                     autoComplete="email"
-                    defaultValue="s.mitchell@hartwellps.vic.edu.au"
-                    placeholder="s.mitchell@hartwellps.vic.edu.au"
+                    defaultValue="parent@hartwellps.vic.edu.au"
+                    placeholder="parent@hartwellps.vic.edu.au"
                     required
                   />
                 </div>

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button, Chip, Stack, Tooltip } from '@mui/material';
 import { DEMO_ACCOUNTS, DemoAccount } from './AuthPageView';
+import { setDemoSessionAction, clearSessionAction, getSessionAction } from '../actions/auth';
 import {
   ScreenId,
   ViewportMode,
@@ -67,27 +68,28 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
   };
 
   const downloadCouncilAuditCsv = () => {
+    // APP 6 Mandatory PII Anonymization: strips student names and replaces IDs with non-reversible corridor hashes
     const csvRows = [
-      ['Date', 'Student_ID', 'Student_Name', 'Grade', 'Corridor_Route', 'Hub_Checkin_Location', 'Checkin_Time', 'Distance_Walked_KM', 'Carbon_Saved_KG', 'Supervisor_Staff'],
-      ['2026-11-06', 'STU-1042', 'Leo Mitchell', 'Year 4B', 'Route B (Myrtle Park)', 'Fordham Gardens Hub', '08:41:22', '1.35', '0.28', 'Ms. Lin'],
-      ['2026-11-06', 'STU-1043', 'Sophie Mitchell', 'Year 1A', 'Route A (Toorak Rd)', 'Gate 2 Main Entrance', '08:44:10', '0.85', '0.18', 'Duty Asst. John'],
-      ['2026-11-06', 'STU-1044', 'Oliver Zhang', 'Year 3A', 'Route B (Myrtle Park)', 'Myrtle Park East Hub', '08:38:05', '1.20', '0.25', 'Duty Asst. Sarah'],
-      ['2026-11-06', 'STU-1045', 'Charlotte Brown', 'Year 2B', 'Route C (Hartwell Stn)', 'Hartwell Station Hub', '08:42:50', '1.10', '0.23', 'Ms. Lin'],
-      ['2026-11-06', 'STU-1046', 'Noah Patel', 'Year 3A', 'Route A (Toorak Rd)', 'Toorak Rd Hub', '08:52:15', '0.95', '0.20', 'Duty Asst. John'],
-      ['2026-11-06', 'STU-1047', 'Mia Watson', 'Prep A', 'Route B (Myrtle Park)', 'Fordham Gardens Hub', '08:40:02', '1.35', '0.28', 'Duty Asst. Sarah'],
-      ['2026-11-06', 'STU-1048', 'Lucas Nguyen', 'Year 5C', 'Route C (Hartwell Stn)', 'Hartwell Station Hub', '08:35:18', '1.60', '0.33', 'Kim Le (Admin)'],
+      ['Date', 'Anonymised_Token', 'Student_Name_PII', 'Year_Level', 'Corridor_Route', 'Hub_Checkin_Location', 'Checkin_Time', 'Distance_Walked_KM', 'Carbon_Saved_KG', 'Verification_Mode'],
+      ['2026-11-06', 'ANON-9F4A', '[REDACTED — APP 6]', 'Year 4', 'Route B (Myrtle Park)', 'Fordham Gardens Hub', '08:41:22', '1.35', '0.28', 'Gate Beacon + Hub QR'],
+      ['2026-11-06', 'ANON-3C8B', '[REDACTED — APP 6]', 'Year 1', 'Route A (Toorak Rd)', 'Gate 2 Main Entrance', '08:44:10', '0.85', '0.18', 'Gate Beacon'],
+      ['2026-11-06', 'ANON-7E1D', '[REDACTED — APP 6]', 'Year 3', 'Route B (Myrtle Park)', 'Myrtle Park East Hub', '08:38:05', '1.20', '0.25', 'Gate Beacon + Hub QR'],
+      ['2026-11-06', 'ANON-2A6F', '[REDACTED — APP 6]', 'Year 2', 'Route C (Hartwell Stn)', 'Hartwell Station Hub', '08:42:50', '1.10', '0.23', 'Gate Beacon + Hub QR'],
+      ['2026-11-06', 'ANON-5B9C', '[REDACTED — APP 6]', 'Year 3', 'Route A (Toorak Rd)', 'Toorak Rd Hub', '08:52:15', '0.95', '0.20', 'Manual Duty Scan'],
+      ['2026-11-06', 'ANON-8D2E', '[REDACTED — APP 6]', 'Prep', 'Route B (Myrtle Park)', 'Fordham Gardens Hub', '08:40:02', '1.35', '0.28', 'Gate Beacon + Hub QR'],
+      ['2026-11-06', 'ANON-4F7A', '[REDACTED — APP 6]', 'Year 5', 'Route C (Hartwell Stn)', 'Hartwell Station Hub', '08:35:18', '1.60', '0.33', 'Gate Beacon + Hub QR'],
     ];
     const csvContent = csvRows.map(row => row.map(v => `"${v}"`).join(',')).join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `hartwell_boroondara_travel_audit_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `hartwell_boroondara_anonymised_audit_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    showToast('📥 Boroondara Council Travel Audit (CSV) downloaded successfully');
+    showToast('📥 Anonymised Boroondara Council Travel Audit (CSV — APP 6 PII Stripped) downloaded');
   };
 
   const [logoutModalOpen, setLogoutModalOpen] = useState<boolean>(false);
@@ -114,6 +116,12 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
         if (parsed?.name && parsed?.roleLabel) {
           setActiveUser(parsed);
         }
+      } else {
+        void getSessionAction().then((serverSession) => {
+          if (serverSession?.name && serverSession?.roleLabel) {
+            setActiveUser(serverSession);
+          }
+        });
       }
       const savedMode = sessionStorage.getItem('hartwell_view_mode');
       if (savedMode === 'real-site' || savedMode === 'figma-canvas') {
@@ -228,29 +236,6 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
     document.body.setAttribute('data-reduced-motion', String(reducedMotion));
   }, [reducedMotion]);
 
-  // Apply bigger text scaling inside #prototype-viewport
-  useEffect(() => {
-    document.querySelectorAll<HTMLElement>('#prototype-viewport *').forEach((element) => {
-      const hasDirectText = Array.from(element.childNodes).some(
-        (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim()
-      );
-      if (!hasDirectText) return;
-
-      if (largeText) {
-        if (!('originalInlineFontSize' in element.dataset)) {
-          element.dataset.originalInlineFontSize = element.style.fontSize || '';
-        }
-        const currentSize = parseFloat(window.getComputedStyle(element).fontSize);
-        if (currentSize) {
-          element.style.fontSize = `${Math.max(currentSize * 1.18, currentSize + 2).toFixed(1)}px`;
-        }
-      } else if ('originalInlineFontSize' in element.dataset) {
-        element.style.fontSize = element.dataset.originalInlineFontSize || '';
-        delete element.dataset.originalInlineFontSize;
-      }
-    });
-  }, [largeText]);
-
   // Escape key closes settings, notifications, mobile menu, and logout modal
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -290,6 +275,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
     } catch {
       // ignore storage errors
     }
+    void setDemoSessionAction(account);
     const targetScreen = account.targetRoute.replace(/^\//, '') as ScreenId;
     if (isValidScreenId(targetScreen)) {
       navigateToScreen(targetScreen);
@@ -587,6 +573,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
           <div
             className={`device-frame ${isDesktopFrame ? 'desktop-frame' : ''}`}
             id="prototype-viewport"
+            data-font-scale={largeText ? (fontScale === '100' ? '125' : fontScale) : '100'}
           >
             {/* Browser Bar (Appears automatically on Desktop / Classroom Smartboard screens S6, S7, S8, S9) */}
             <div className="browser-chrome-bar">
@@ -1047,7 +1034,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                       <input
                         type="text"
                         className="input-box"
-                        value="s.mitchell@hartwellps.vic.edu.au"
+                        value="parent@hartwellps.vic.edu.au"
                         readOnly
                       />
                     </div>
@@ -2505,21 +2492,30 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                         <button
                           type="button"
                           className={`seg-btn ${fontScale === '100' ? 'active' : ''}`}
-                          onClick={() => setFontScale('100')}
+                          onClick={() => {
+                            setFontScale('100');
+                            setLargeText(false);
+                          }}
                         >
                           100% Default
                         </button>
                         <button
                           type="button"
                           className={`seg-btn ${fontScale === '125' ? 'active' : ''}`}
-                          onClick={() => setFontScale('125')}
+                          onClick={() => {
+                            setFontScale('125');
+                            setLargeText(true);
+                          }}
                         >
                           125% Large (Active)
                         </button>
                         <button
                           type="button"
                           className={`seg-btn ${fontScale === '150' ? 'active' : ''}`}
-                          onClick={() => setFontScale('150')}
+                          onClick={() => {
+                            setFontScale('150');
+                            setLargeText(true);
+                          }}
                         >
                           150% Extra High
                         </button>
@@ -2826,6 +2822,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                         onClick={() => {
                           const next = !largeText;
                           setLargeText(next);
+                          if (next && fontScale === '100') setFontScale('125');
                           setSrAnnouncement(next ? 'Bigger text scaling enabled' : 'Bigger text scaling disabled');
                         }}
                       ></button>
@@ -3016,6 +3013,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                         } catch {
                           // ignore
                         }
+                        void clearSessionAction();
                         setLogoutConfirmed(true);
                         setSettingsOpen(false);
                       }}

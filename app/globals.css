@@ -2345,3 +2345,13 @@ body[data-high-contrast="true"] .real-site-footer a,
   text-decoration: underline !important;
 }
 
+/* Portal-wide Accessibility Typography Scaling (WCAG 2.2 AAA / S9 & Settings) */
+#prototype-viewport[data-font-scale="125"] {
+  zoom: 1.12;
+}
+
+#prototype-viewport[data-font-scale="150"] {
+  zoom: 1.24;
+}
+
+

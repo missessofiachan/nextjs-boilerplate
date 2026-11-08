@@ -6,12 +6,45 @@ import {
   UserRole,
   createSession,
   deleteSession,
+  SessionPayload,
 } from '../lib/session';
 
 export interface AuthActionState {
   error?: string;
   success?: boolean;
 }
+
+export async function getSessionAction(): Promise<SessionPayload | null> {
+  const { getSession } = await import('../lib/session');
+  return getSession();
+}
+
+export async function setDemoSessionAction(user: {
+  id: UserRole;
+  name: string;
+  initials: string;
+  email: string;
+  roleLabel: string;
+  targetRoute: string;
+  targetTitle: string;
+  accessSummary: string;
+}): Promise<SessionPayload> {
+  return createSession({
+    role: user.id,
+    name: user.name,
+    initials: user.initials,
+    email: user.email,
+    roleLabel: user.roleLabel,
+    targetRoute: user.targetRoute,
+    targetTitle: user.targetTitle,
+    accessSummary: user.accessSummary,
+  });
+}
+
+export async function clearSessionAction(): Promise<void> {
+  await deleteSession();
+}
+
 
 export async function loginAction(
   prevState: AuthActionState | undefined,
