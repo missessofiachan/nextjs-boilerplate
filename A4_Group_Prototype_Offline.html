@@ -53,6 +53,20 @@
       --gold-text: #075985;
     }
 
+    body[data-high-contrast="true"] {
+      --primary: #000000;
+      --primary-dark: #000000;
+      --primary-mid: #003B73;
+      --primary-light: #FFF3A3;
+      --secondary: #FFD400;
+      --secondary-light: #FFFBE6;
+      --bg-app: #FFFFFF;
+      --bg-card: #FFFFFF;
+      --text-main: #000000;
+      --text-muted: #111111;
+      --border-color: #000000;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -386,10 +400,32 @@
       align-items: center;
     }
 
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .school-logo {
+      width: 58px;
+      aspect-ratio: 431 / 379;
+      flex: 0 0 auto;
+      background-color: var(--primary-light);
+      -webkit-mask: url("./assets/hartwell-crest-mask.png") center / contain no-repeat;
+      mask: url("./assets/hartwell-crest-mask.png") center / contain no-repeat;
+      filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.24));
+    }
+
+    .device-frame.desktop-frame .school-logo {
+      width: 68px;
+    }
+
     .school-title {
       font-size: 16px;
       font-weight: 800;
       letter-spacing: -0.2px;
+      line-height: 1.2;
     }
 
     .contrast-tag {
@@ -941,13 +977,15 @@
       cursor: pointer;
     }
 
-    /* Persistent Bottom Navigation Bar (5 Tabs) */
+    /* Persistent Bottom Navigation Bar */
     .bottom-nav {
       background: #FFFFFF;
       border-top: 2px solid var(--border-color);
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       padding: 6px 4px;
+      position: relative;
+      z-index: 60;
     }
 
     .tab-btn {
@@ -968,6 +1006,257 @@
     .tab-btn.active {
       color: var(--primary);
       background: var(--primary-light);
+    }
+
+    .tab-icon {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .settings-backdrop {
+      position: absolute;
+      inset: 0 0 58px;
+      z-index: 55;
+      display: none;
+      align-items: flex-end;
+      background: rgba(15, 23, 42, 0.62);
+      backdrop-filter: blur(2px);
+    }
+
+    .settings-backdrop.open {
+      display: flex;
+    }
+
+    .settings-sheet {
+      width: 100%;
+      max-height: 82%;
+      overflow-y: auto;
+      padding: 18px;
+      color: var(--text-main);
+      background: var(--bg-card);
+      border-top: 3px solid var(--secondary);
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -18px 45px rgba(15, 23, 42, 0.32);
+    }
+
+    .device-frame.desktop-frame .settings-sheet {
+      max-width: 460px;
+      margin-left: auto;
+      border-left: 1px solid var(--border-color);
+      border-radius: 20px 0 0 0;
+    }
+
+    .settings-header,
+    .settings-row,
+    .account-summary {
+      display: flex;
+      align-items: center;
+    }
+
+    .settings-header {
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .settings-kicker {
+      color: var(--primary-mid);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .settings-title {
+      margin-top: 2px;
+      font-size: 20px;
+      line-height: 1.15;
+    }
+
+    .settings-close {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      border: 1px solid var(--border-color);
+      border-radius: 50%;
+      color: var(--text-main);
+      background: var(--bg-app);
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .account-summary {
+      gap: 11px;
+      padding: 11px 12px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--primary-light);
+    }
+
+    .account-avatar {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 50%;
+      color: #FFFFFF;
+      background: var(--primary);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .account-summary-name {
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .account-summary-role,
+    .settings-row-copy span,
+    .account-detail-label {
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    .settings-list {
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--bg-card);
+    }
+
+    .settings-row {
+      width: 100%;
+      min-height: 57px;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 0;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+      background: transparent;
+      text-align: left;
+    }
+
+    button.settings-row {
+      cursor: pointer;
+    }
+
+    .settings-row:last-child {
+      border-bottom: 0;
+    }
+
+    .settings-row-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .settings-row-copy strong {
+      font-size: 13px;
+    }
+
+    .settings-chevron {
+      color: var(--text-muted);
+      font-size: 18px;
+    }
+
+    .settings-switch {
+      width: 42px;
+      height: 24px;
+      flex: 0 0 auto;
+      padding: 3px;
+      border: 0;
+      border-radius: 999px;
+      background: #94A3B8;
+      cursor: pointer;
+      transition: background 0.18s ease;
+    }
+
+    .settings-switch::after {
+      content: "";
+      display: block;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      transition: transform 0.18s ease;
+    }
+
+    .settings-switch[aria-pressed="true"] {
+      background: var(--primary);
+    }
+
+    .settings-switch[aria-pressed="true"]::after {
+      transform: translateX(18px);
+    }
+
+    .settings-logout {
+      color: #991B1B;
+    }
+
+    .account-details {
+      display: none;
+      padding: 4px 0;
+    }
+
+    .account-details.open {
+      display: block;
+    }
+
+    .account-detail-card {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--bg-app);
+    }
+
+    .account-detail-value {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .account-back {
+      margin-bottom: 12px;
+      border: 0;
+      color: var(--primary);
+      background: transparent;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .logout-card {
+      border-color: var(--primary);
+    }
+
+    #logout-modal {
+      z-index: 70;
+    }
+
+    .logout-card .modal-title {
+      color: var(--text-main);
+    }
+
+    .btn-confirm-logout {
+      padding: 9px;
+      border: 0;
+      border-radius: 6px;
+      color: #FFFFFF;
+      background: #991B1B;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
     }
 
     /* Figma Version History Panel (Right Drawer) */
@@ -1119,7 +1408,7 @@
         <div class="nav-item-sub">Sofia M. + Member B | REQ-ENV-02 CR-01 Detour</div>
       </button>
 
-      <div class="sidebar-group-title member-b-hdr">Member B: Partner (4.5 Screens)</div>
+      <div class="sidebar-group-title member-b-hdr">Member B: Kim Le (4.5 Screens)</div>
       <button class="nav-item" id="nav-s6" onclick="showScreen('s6')">
         <div class="nav-item-top">
           <span>S6: Hub Roll Call &amp; KPIs</span>
@@ -1128,7 +1417,7 @@
             <span class="nav-req-badge">UC-06</span>
           </div>
         </div>
-        <div class="nav-item-sub">Member B | REQ-TRK-03 39%&rarr;51% Gate KPIs</div>
+        <div class="nav-item-sub">Kim Le | REQ-TRK-03 39%&rarr;51% Gate KPIs</div>
       </button>
 
       <button class="nav-item" id="nav-s7" onclick="showScreen('s7')">
@@ -1139,7 +1428,7 @@
             <span class="nav-req-badge">UC-07</span>
           </div>
         </div>
-        <div class="nav-item-sub">Member B | REQ-PAR-01 08:46 AM Arrival</div>
+        <div class="nav-item-sub">Kim Le | REQ-PAR-01 08:46 AM Arrival</div>
       </button>
 
       <button class="nav-item" id="nav-s8" onclick="showScreen('s8')">
@@ -1150,7 +1439,7 @@
             <span class="nav-req-badge">UC-08</span>
           </div>
         </div>
-        <div class="nav-item-sub">Member B | REQ-ETH-01 Golden Boot &amp; APP 6</div>
+        <div class="nav-item-sub">Kim Le | REQ-ETH-01 Golden Boot &amp; APP 6</div>
       </button>
 
       <button class="nav-item" id="nav-s9" onclick="showScreen('s9')">
@@ -1161,7 +1450,7 @@
             <span class="nav-req-badge">UC-09</span>
           </div>
         </div>
-        <div class="nav-item-sub">Member B | REQ-ACC-01 Locked PII &amp; WCAG</div>
+        <div class="nav-item-sub">Kim Le | REQ-ACC-01 Locked PII &amp; WCAG</div>
       </button>
     </aside>
 
@@ -1188,19 +1477,18 @@
 
         <!-- Top Status Bar -->
         <div class="device-statusbar">
-          <span id="statusbar-left">08:46 AM | Boroondara SafeNet</span>
           <span class="sla-pill">SLA: 0.38s Live Cloud Sync</span>
         </div>
 
         <!-- App Header -->
         <div class="app-header">
           <div class="app-header-top">
-            <span class="school-title">Hartwell Primary School — Sustainable Travel System</span>
-            <span class="contrast-tag" id="contrast-indicator">11.4:1 WCAG AAA</span>
+            <div class="app-brand">
+              <span class="school-logo" role="img" aria-label="Hartwell Primary School stag crest"></span>
+              <span class="school-title">Hartwell Primary School — Sustainable Travel System</span>
+            </div>
           </div>
           <div class="screen-subtitle-bar">
-            <span id="header-screen-title">S1: Unified Login &amp; Dynamic OTP</span>
-            <span id="header-owner-badge">Owner: Sofia M. (Member A) | UC-01</span>
           </div>
         </div>
 
@@ -1226,9 +1514,9 @@
                     <span class="control-type-hint">[Segmented Control]</span>
                   </label>
                   <div class="segmented-control">
-                    <button class="seg-btn" onclick="showScreen('s7')">Parent (PC/App)</button>
+                    <button class="seg-btn" onclick="window.location.href='./parent-login.html'">Parent (PC/App)</button>
                     <button class="seg-btn active">Duty Assistant (App)</button>
-                    <button class="seg-btn" onclick="showScreen('s8')">Teacher (Smartboard)</button>
+                    <button class="seg-btn" onclick="window.location.href='./admin-login.html'">Staff / Admin</button>
                   </div>
                 </div>
 
@@ -1815,27 +2103,122 @@
           </div>
         </div>
 
-        <!-- Persistent 5-Tab Bottom Navigation Bar -->
+        <div class="settings-backdrop" id="settings-panel" onclick="handleSettingsBackdrop(event)">
+          <section class="settings-sheet" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+            <div id="settings-main">
+              <div class="settings-header">
+                <div>
+                  <div class="settings-kicker">Preferences</div>
+                  <h2 class="settings-title" id="settings-title">Settings</h2>
+                </div>
+                <button class="settings-close" type="button" onclick="closeSettings()" aria-label="Close settings">&times;</button>
+              </div>
+
+              <div class="account-summary">
+                <div class="account-avatar" aria-hidden="true">KL</div>
+                <div>
+                  <div class="account-summary-name">Kim Le</div>
+                  <div class="account-summary-role">School travel partner</div>
+                </div>
+              </div>
+
+              <div class="settings-list">
+                <div class="settings-row">
+                  <div class="settings-row-copy">
+                    <strong>High contrast</strong>
+                    <span>Increase colour and border contrast</span>
+                  </div>
+                  <button class="settings-switch" id="contrast-toggle" type="button" aria-label="High contrast" aria-pressed="false" onclick="toggleHighContrast()"></button>
+                </div>
+                <div class="settings-row">
+                  <div class="settings-row-copy">
+                    <strong>Bigger text</strong>
+                    <span>Enlarge text across the app</span>
+                  </div>
+                  <button class="settings-switch" id="text-size-toggle" type="button" aria-label="Bigger text" aria-pressed="false" onclick="toggleLargeText()"></button>
+                </div>
+                <button class="settings-row" type="button" onclick="showAccountDetails()">
+                  <span class="settings-row-copy">
+                    <strong>Account</strong>
+                    <span>View your profile and access level</span>
+                  </span>
+                  <span class="settings-chevron" aria-hidden="true">&rsaquo;</span>
+                </button>
+                <button class="settings-row settings-logout" type="button" onclick="openLogoutConfirmation()">
+                  <span class="settings-row-copy">
+                    <strong>Log out</strong>
+                    <span>Sign out of this device</span>
+                  </span>
+                  <span class="settings-chevron" aria-hidden="true">&rsaquo;</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="account-details" id="account-details">
+              <button class="account-back" type="button" onclick="hideAccountDetails()">&larr; Back to settings</button>
+              <div class="settings-header">
+                <div>
+                  <div class="settings-kicker">Your profile</div>
+                  <h2 class="settings-title">Account</h2>
+                </div>
+              </div>
+              <div class="account-detail-card">
+                <div>
+                  <div class="account-detail-label">Name</div>
+                  <div class="account-detail-value">Kim Le</div>
+                </div>
+                <div>
+                  <div class="account-detail-label">Role</div>
+                  <div class="account-detail-value">School travel partner</div>
+                </div>
+                <div>
+                  <div class="account-detail-label">Access</div>
+                  <div class="account-detail-value">Parent portal, whiteboard and council reporting</div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="modal-backdrop" id="logout-modal">
+          <div class="modal-card logout-card" role="alertdialog" aria-modal="true" aria-labelledby="logout-title">
+            <div class="modal-title" id="logout-title">Log out of this device?</div>
+            <div class="modal-desc" id="logout-description">You will need to sign in again to access school travel information.</div>
+            <div class="modal-actions" id="logout-actions">
+              <button class="btn-cancel" id="logout-cancel" type="button" onclick="closeLogoutConfirmation()">Cancel</button>
+              <button class="btn-confirm-logout" id="logout-confirm" type="button" onclick="confirmLogout()">Log out</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Persistent 6-Tab Bottom Navigation Bar -->
         <nav class="bottom-nav">
           <button class="tab-btn active" id="tab-home" onclick="showScreen('s1')">
             <span>&#128274;</span>
-            <span>S1–S3 Track</span>
+            <span> Track</span>
           </button>
           <button class="tab-btn" id="tab-weather" onclick="showScreen('s4')">
             <span>&#9928;</span>
-            <span>S4 Weather</span>
+            <span> Weather</span>
           </button>
           <button class="tab-btn" id="tab-reroute" onclick="showScreen('s5')">
             <span>&#9888;</span>
-            <span>S5 CR-01</span>
+            <span>Reroute</span>
           </button>
           <button class="tab-btn" id="tab-parent" onclick="showScreen('s7')">
             <span>&#128205;</span>
-            <span>S7 Parent PC/App</span>
+            <span> Parent PC/App</span>
           </button>
           <button class="tab-btn" id="tab-privacy" onclick="showScreen('s8')">
             <span>&#127942;</span>
-            <span>S8–S9 Whiteboard</span>
+            <span> Whiteboard</span>
+          </button>
+          <button class="tab-btn" id="tab-settings" type="button" onclick="toggleSettings()" aria-controls="settings-panel" aria-expanded="false">
+            <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"></path>
+            </svg>
+            <span>Settings</span>
           </button>
         </nav>
       </div>
@@ -1862,7 +2245,7 @@
           <span>v2.3 — Smartboard S8, S6–S9 &amp; CR-01</span>
           <span class="vh-time">06 Nov, 16:15</span>
         </div>
-        <div class="vh-author">Member B (Partner — 0.5 S5 + S6, S7, S8, S9)</div>
+        <div class="vh-author">Kim Le (Partner — 0.5 S5 + S6, S7, S8, S9)</div>
         <div class="vh-desc">Built S6 Hub Roll Call &amp; KPIs, S7 Parent Geofence Portal, S8 Classroom Smartboard Golden Boot Leaderboard + 08:00–09:00 AM GPS window, and S9 Locked PII toggle.</div>
       </div>
 
@@ -1871,7 +2254,7 @@
           <span>v2.2 — Client Change Request CR-01 (S5)</span>
           <span class="vh-time">05 Nov, 20:10</span>
         </div>
-        <div class="vh-author">Sofia Mironenko + Member B (Co-Owned S5 Bridge)</div>
+        <div class="vh-author">Sofia Mironenko + Kim Le (Co-Owned S5 Bridge)</div>
         <div class="vh-desc">Connected Sofia M.'s S4 BOM Weather Squall trigger to S5 Myrtle Park Greenway 500m Hub override and Member B's S7 Live Parent Map alert.</div>
       </div>
 
@@ -1880,7 +2263,7 @@
           <span>v2.0 — Client Colour Scheme B Swap</span>
           <span class="vh-time">04 Nov, 14:30</span>
         </div>
-        <div class="vh-author">Sofia Mironenko + Member B (Client: Akrati Jain)</div>
+        <div class="vh-author">Sofia Mironenko + Kim Le (Client: Akrati Jain)</div>
         <div class="vh-desc">Swapped global design tokens from Scheme A (#1E3A8A Navy) to Client-Selected Scheme B (#1B5E20 Eco-Safe Green, 11.4:1 AAA) across all 9 screens in &lt;10s.</div>
       </div>
 
@@ -1889,7 +2272,7 @@
           <span>v1.0 — Initial SRS Baseline (4.5 Screens Each)</span>
           <span class="vh-time">02 Nov, 11:00</span>
         </div>
-        <div class="vh-author">Sofia Mironenko (4.5) &amp; Member B (4.5)</div>
+        <div class="vh-author">Sofia Mironenko (4.5) &amp; Kim Le (4.5)</div>
         <div class="vh-desc">Established shared Auto-Layout master navigation bar and equal 2-member attribution across UC-01 through UC-09.</div>
       </div>
     </aside>
@@ -2001,6 +2384,7 @@
 
     function showScreen(screenId) {
       currentScreenId = screenId;
+      closeSettings();
       document.querySelectorAll('.screen-pane').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
       const pane = document.getElementById('pane-' + screenId);
@@ -2009,11 +2393,114 @@
       if (nav) nav.classList.add('active');
 
       if (screenMeta[screenId]) {
-        document.getElementById('header-screen-title').textContent = screenMeta[screenId].title;
-        document.getElementById('header-owner-badge').textContent = screenMeta[screenId].owner;
+        const headerScreenTitle = document.getElementById('header-screen-title');
+        const headerOwnerBadge = document.getElementById('header-owner-badge');
+        if (headerScreenTitle) headerScreenTitle.textContent = screenMeta[screenId].title;
+        if (headerOwnerBadge) headerOwnerBadge.textContent = screenMeta[screenId].owner;
       }
       applyViewportSize(screenId);
       closeModal();
+    }
+
+    function syncBottomNavigation() {
+      document.querySelectorAll('.bottom-nav .tab-btn').forEach(el => el.classList.remove('active'));
+      const tabByScreen = {
+        s1: 'tab-home', s2: 'tab-home', s3: 'tab-home',
+        s4: 'tab-weather', s5: 'tab-reroute',
+        s7: 'tab-parent', s8: 'tab-privacy', s9: 'tab-privacy'
+      };
+      const activeTab = document.getElementById(tabByScreen[currentScreenId] || 'tab-home');
+      if (activeTab) activeTab.classList.add('active');
+    }
+
+    function toggleSettings() {
+      const panel = document.getElementById('settings-panel');
+      if (panel.classList.contains('open')) {
+        closeSettings();
+        return;
+      }
+      hideAccountDetails();
+      panel.classList.add('open');
+      const settingsTab = document.getElementById('tab-settings');
+      document.querySelectorAll('.bottom-nav .tab-btn').forEach(el => el.classList.remove('active'));
+      settingsTab.classList.add('active');
+      settingsTab.setAttribute('aria-expanded', 'true');
+      document.querySelector('.settings-close').focus();
+    }
+
+    function closeSettings() {
+      const panel = document.getElementById('settings-panel');
+      if (!panel) return;
+      panel.classList.remove('open');
+      document.getElementById('tab-settings').setAttribute('aria-expanded', 'false');
+      syncBottomNavigation();
+    }
+
+    function handleSettingsBackdrop(event) {
+      if (event.target.id === 'settings-panel') closeSettings();
+    }
+
+    function toggleHighContrast() {
+      const toggle = document.getElementById('contrast-toggle');
+      const enabled = toggle.getAttribute('aria-pressed') !== 'true';
+      toggle.setAttribute('aria-pressed', String(enabled));
+      document.body.setAttribute('data-high-contrast', String(enabled));
+    }
+
+    function toggleLargeText() {
+      const toggle = document.getElementById('text-size-toggle');
+      const enabled = toggle.getAttribute('aria-pressed') !== 'true';
+      toggle.setAttribute('aria-pressed', String(enabled));
+
+      document.querySelectorAll('#prototype-viewport *').forEach(element => {
+        const hasDirectText = Array.from(element.childNodes).some(node =>
+          node.nodeType === Node.TEXT_NODE && node.textContent.trim()
+        );
+        if (!hasDirectText) return;
+
+        if (enabled) {
+          element.dataset.originalInlineFontSize = element.style.fontSize || '';
+          const currentSize = parseFloat(window.getComputedStyle(element).fontSize);
+          if (currentSize) element.style.fontSize = `${Math.max(currentSize * 1.18, currentSize + 2).toFixed(1)}px`;
+        } else if ('originalInlineFontSize' in element.dataset) {
+          element.style.fontSize = element.dataset.originalInlineFontSize;
+          delete element.dataset.originalInlineFontSize;
+        }
+      });
+    }
+
+    function showAccountDetails() {
+      document.getElementById('settings-main').style.display = 'none';
+      document.getElementById('account-details').classList.add('open');
+    }
+
+    function hideAccountDetails() {
+      const main = document.getElementById('settings-main');
+      const details = document.getElementById('account-details');
+      if (main) main.style.display = '';
+      if (details) details.classList.remove('open');
+    }
+
+    function openLogoutConfirmation() {
+      document.getElementById('logout-title').textContent = 'Log out of this device?';
+      document.getElementById('logout-description').textContent = 'You will need to sign in again to access school travel information.';
+      document.getElementById('logout-confirm').style.display = '';
+      document.getElementById('logout-cancel').textContent = 'Cancel';
+      document.getElementById('logout-actions').style.gridTemplateColumns = '';
+      document.getElementById('logout-modal').classList.add('open');
+    }
+
+    function closeLogoutConfirmation() {
+      document.getElementById('logout-modal').classList.remove('open');
+    }
+
+    function confirmLogout() {
+      document.getElementById('logout-title').textContent = 'You are logged out';
+      document.getElementById('logout-description').textContent = 'Your session has ended safely on this device.';
+      document.getElementById('logout-confirm').style.display = 'none';
+      document.getElementById('logout-cancel').textContent = 'Done';
+      document.getElementById('logout-actions').style.gridTemplateColumns = '1fr';
+      closeSettings();
     }
 
     function setScheme(scheme) {
@@ -2024,11 +2511,11 @@
       if (scheme === 'scheme-a') {
         btnA.classList.add('active-navy');
         btnB.classList.remove('active');
-        contrast.textContent = '7.2:1 Contrast (Scheme A)';
+        if (contrast) contrast.textContent = '7.2:1 Contrast (Scheme A)';
       } else {
         btnB.classList.add('active');
         btnA.classList.remove('active-navy');
-        contrast.textContent = '11.4:1 WCAG AAA (Scheme B)';
+        if (contrast) contrast.textContent = '11.4:1 WCAG AAA (Scheme B)';
       }
     }
 
@@ -2055,6 +2542,12 @@
       if (vp) setViewportMode(vp);
       if (screen) showScreen(screen);
       if (modal === '1') openModal();
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape') return;
+      closeLogoutConfirmation();
+      closeSettings();
     });
   </script>
 </body>

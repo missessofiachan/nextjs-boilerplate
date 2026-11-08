@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Create a Hartwell Primary School parent travel portal account." />
+    <title>Parent sign up | Hartwell Primary School</title>
+    <link rel="stylesheet" href="./auth.css" />
+  </head>
+  <body>
+    <main class="auth-shell">
+      <section class="story-panel" aria-labelledby="welcome-title">
+        <a class="brand" href="./index.html">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="brand-copy">
+            <strong>Hartwell Primary School</strong>
+            <span>Sustainable Travel Portal</span>
+          </span>
+        </a>
+        <div class="story-content">
+          <p class="eyebrow">Join the community</p>
+          <h1 id="welcome-title">Safer mornings start with a connected family.</h1>
+          <p>Create your parent account to receive timely travel updates and access your child’s walking group information.</p>
+          <div class="trust-list" aria-label="Account benefits">
+            <div class="trust-item">
+              <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M8 18a4 4 0 0 1 8 0"/><circle cx="12" cy="9" r="3"/><circle cx="12" cy="12" r="10"/></svg>
+              <strong>One family account</strong>
+              <span>Keep sibling travel details together.</span>
+            </div>
+            <div class="trust-item">
+              <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12.5 9.2 17 19 7"/></svg>
+              <strong>Verified connection</strong>
+              <span>Link securely using school records.</span>
+            </div>
+          </div>
+        </div>
+        <p class="story-footer">Designed for Hartwell families and our active travel community.</p>
+      </section>
+
+      <section class="form-panel" aria-labelledby="signup-title">
+        <div class="form-topbar">
+          <a class="back-link" href="./parent-login.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+            Back to login
+          </a>
+          <span class="secure-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            Secure registration
+          </span>
+        </div>
+
+        <div class="form-wrap">
+          <p class="form-kicker">Get started</p>
+          <h2 id="signup-title">Create parent account</h2>
+          <p class="form-intro">Use the same details provided to the school office so we can match your family record.</p>
+
+          <div class="demo-accounts" aria-label="Demo parent registration">
+            <p class="demo-accounts-title">Quick-Fill Demo Registration</p>
+            <div class="demo-accounts-grid">
+              <button type="button" class="demo-account-btn" data-demo-account="parent">
+                <span class="demo-account-role">Pre-fill Sarah Mitchell (Parent of Leo &amp; Sophie)</span>
+                <span class="demo-account-creds">parent@hartwellps.vic.edu.au</span>
+              </button>
+            </div>
+          </div>
+
+          <form data-auth-form novalidate>
+            <div class="field-row">
+              <div class="field">
+                <div class="field-head"><label for="first-name">First name</label></div>
+                <div class="input-wrap"><input id="first-name" name="firstName" autocomplete="given-name" placeholder="First name" required /></div>
+                <p class="field-error">Enter your first name.</p>
+              </div>
+              <div class="field">
+                <div class="field-head"><label for="last-name">Last name</label></div>
+                <div class="input-wrap"><input id="last-name" name="lastName" autocomplete="family-name" placeholder="Last name" required /></div>
+                <p class="field-error">Enter your last name.</p>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="field-head"><label for="email">Email address</label></div>
+              <div class="input-wrap"><input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required /></div>
+              <p class="field-error">Enter a valid email address.</p>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <div class="field-head"><label for="new-password">Password</label></div>
+                <div class="input-wrap">
+                  <input id="new-password" name="password" type="password" autocomplete="new-password" placeholder="At least 8 characters" minlength="8" data-new-password required />
+                  <button class="password-toggle" type="button" data-password-toggle="new-password" aria-label="Show password"></button>
+                </div>
+                <p class="field-error">Use at least 8 characters.</p>
+              </div>
+              <div class="field">
+                <div class="field-head"><label for="confirm-password">Confirm password</label></div>
+                <div class="input-wrap">
+                  <input id="confirm-password" name="confirmPassword" type="password" autocomplete="new-password" placeholder="Repeat password" minlength="8" data-confirm-password required />
+                  <button class="password-toggle" type="button" data-password-toggle="confirm-password" aria-label="Show password"></button>
+                </div>
+                <p class="field-error">Passwords must match.</p>
+              </div>
+            </div>
+
+            <label class="consent">
+              <input type="checkbox" name="consent" required />
+              <span>I agree to the school’s <a href="mailto:office@hartwellps.vic.edu.au?subject=Parent%20portal%20privacy%20policy">privacy and acceptable use policy</a>.</span>
+            </label>
+
+            <button class="submit-button" type="submit">Create parent account</button>
+            <p class="form-status" role="status" tabindex="-1"></p>
+          </form>
+
+          <p class="form-footnote">Already have an account? <a href="./parent-login.html">Sign in</a></p>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="./auth.js"></script>
+  </body>
+</html>

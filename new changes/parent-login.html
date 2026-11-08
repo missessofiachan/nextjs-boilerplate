@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Parent sign in for Hartwell Primary School's Sustainable Travel Portal." />
+    <title>Parent login | Hartwell Primary School</title>
+    <link rel="stylesheet" href="./auth.css" />
+  </head>
+  <body>
+    <main class="auth-shell">
+      <section class="story-panel" aria-labelledby="welcome-title">
+        <a class="brand" href="./index.html">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="brand-copy">
+            <strong>Hartwell Primary School</strong>
+            <span>Sustainable Travel Portal</span>
+          </span>
+        </a>
+        <div class="story-content">
+          <p class="eyebrow">Parent portal</p>
+          <h1 id="welcome-title">Your family’s school journey, all in one place.</h1>
+          <p>Follow morning walking groups, view arrival updates and manage your children’s travel details securely.</p>
+          <div class="trust-list" aria-label="Portal benefits">
+            <div class="trust-item">
+              <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 21s7-4.4 7-11V5l-7-3-7 3v5c0 6.6 7 11 7 11Z"/><path d="m9.5 11.5 1.7 1.7 3.7-4"/></svg>
+              <strong>Private by design</strong>
+              <span>Family information stays protected.</span>
+            </div>
+            <div class="trust-item">
+              <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.7 1.6"/></svg>
+              <strong>Morning updates</strong>
+              <span>See arrivals during the school window.</span>
+            </div>
+          </div>
+        </div>
+        <p class="story-footer">A safe, active journey to school starts together.</p>
+      </section>
+
+      <section class="form-panel" aria-labelledby="login-title">
+        <div class="form-topbar">
+          <a class="back-link" href="./index.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+            Back to portal
+          </a>
+          <span class="secure-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            Secure access
+          </span>
+        </div>
+
+        <div class="form-wrap">
+          <p class="form-kicker">Welcome back</p>
+          <h2 id="login-title">Parent login</h2>
+          <p class="form-intro">Sign in with the email address linked to your family account.</p>
+
+          <nav class="access-switch" aria-label="Choose access type">
+            <a href="./parent-login.html" aria-current="page">Parent access</a>
+            <a href="./admin-login.html">Staff &amp; admin</a>
+          </nav>
+
+          <div class="demo-accounts" aria-label="Demo parent account">
+            <p class="demo-accounts-title">Quick-Fill Demo Account</p>
+            <div class="demo-accounts-grid">
+              <button type="button" class="demo-account-btn" data-demo-account="parent">
+                <span class="demo-account-role">Parent: Sarah Mitchell &rarr; S7</span>
+                <span class="demo-account-creds">parent@hartwellps.vic.edu.au</span>
+                <span class="demo-account-creds">Pass: HartwellParent2026!</span>
+              </button>
+            </div>
+          </div>
+
+          <form data-auth-form novalidate>
+            <div class="field">
+              <div class="field-head"><label for="email">Email address</label></div>
+              <div class="input-wrap">
+                <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required />
+              </div>
+              <p class="field-error">Enter a valid email address.</p>
+            </div>
+
+            <div class="field">
+              <div class="field-head">
+                <label for="password">Password</label>
+                <a class="field-link" href="mailto:office@hartwellps.vic.edu.au?subject=Parent%20portal%20password%20help">Forgot password?</a>
+              </div>
+              <div class="input-wrap">
+                <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" minlength="8" required />
+                <button class="password-toggle" type="button" data-password-toggle="password" aria-label="Show password"></button>
+              </div>
+              <p class="field-error">Enter your password (at least 8 characters).</p>
+            </div>
+
+            <button class="submit-button" type="submit">Sign in to parent portal</button>
+            <p class="form-status" role="status" tabindex="-1"></p>
+          </form>
+
+          <p class="form-footnote">New to the travel portal? <a href="./parent-signup.html">Create a parent account</a></p>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="./auth.js"></script>
+  </body>
+</html>

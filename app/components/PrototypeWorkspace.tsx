@@ -27,6 +27,41 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
   const [historyOpen, setHistoryOpen] = useState<boolean>(true);
   const [sosDispatchedBanner, setSosDispatchedBanner] = useState<boolean>(false);
 
+  // Settings & accessibility drawer state
+  const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
+  const [accountDetailsOpen, setAccountDetailsOpen] = useState<boolean>(false);
+  const [highContrast, setHighContrast] = useState<boolean>(false);
+  const [largeText, setLargeText] = useState<boolean>(false);
+  const [logoutModalOpen, setLogoutModalOpen] = useState<boolean>(false);
+  const [logoutConfirmed, setLogoutConfirmed] = useState<boolean>(false);
+  const [activeUser, setActiveUser] = useState<{
+    name: string;
+    initials: string;
+    roleLabel: string;
+    email: string;
+    accessSummary: string;
+  }>({
+    name: 'Kim Le',
+    initials: 'KL',
+    roleLabel: 'School travel partner',
+    email: 'admin@hartwellps.vic.edu.au',
+    accessSummary: 'Parent portal, whiteboard and council reporting',
+  });
+
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem('hartwell_demo_user');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed?.name && parsed?.roleLabel) {
+          setActiveUser(parsed);
+        }
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }, []);
+
   // Interactive form states for enhanced prototype realism while preserving exact defaults
   const [selectedDate, setSelectedDate] = useState<string>('2026-11-02');
   const [selectedGroup, setSelectedGroup] = useState<string>(
@@ -78,13 +113,52 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
     }
   }, [searchParams]);
 
-  // Keep body data-theme attribute in sync
+  // Keep body data-theme and data-high-contrast attributes in sync
   useEffect(() => {
     document.body.setAttribute('data-theme', scheme);
   }, [scheme]);
 
+  useEffect(() => {
+    document.body.setAttribute('data-high-contrast', String(highContrast));
+  }, [highContrast]);
+
+  // Apply bigger text scaling inside #prototype-viewport
+  useEffect(() => {
+    document.querySelectorAll<HTMLElement>('#prototype-viewport *').forEach((element) => {
+      const hasDirectText = Array.from(element.childNodes).some(
+        (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim()
+      );
+      if (!hasDirectText) return;
+
+      if (largeText) {
+        if (!('originalInlineFontSize' in element.dataset)) {
+          element.dataset.originalInlineFontSize = element.style.fontSize || '';
+        }
+        const currentSize = parseFloat(window.getComputedStyle(element).fontSize);
+        if (currentSize) {
+          element.style.fontSize = `${Math.max(currentSize * 1.18, currentSize + 2).toFixed(1)}px`;
+        }
+      } else if ('originalInlineFontSize' in element.dataset) {
+        element.style.fontSize = element.dataset.originalInlineFontSize || '';
+        delete element.dataset.originalInlineFontSize;
+      }
+    });
+  }, [largeText]);
+
+  // Escape key closes settings and logout modal
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      setLogoutModalOpen(false);
+      setSettingsOpen(false);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, []);
+
   const navigateToScreen = (screenId: ScreenId, openSosModal = false) => {
     setCurrentScreenId(screenId);
+    setSettingsOpen(false);
     setModalOpen(openSosModal);
 
     // Update browser route cleanly so every screen has a working shareable Next.js route
@@ -116,7 +190,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
   const memberBScreens = ALL_SCREEN_IDS.filter((id) => SCREEN_META[id].memberGroup === 'B');
 
   return (
-    <div className="prototype-root" data-theme={scheme}>
+    <div className="prototype-root" data-theme={scheme} data-high-contrast={String(highContrast)}>
       {/* TOP FIGMA / CASE TOOL BAR */}
       <header className="case-toolbar">
         <div className="case-brand">
@@ -221,7 +295,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
             );
           })}
 
-          <div className="sidebar-group-title member-b-hdr">Member B: Partner (4.5 Screens)</div>
+          <div className="sidebar-group-title member-b-hdr">Member B: Kim Le (4.5 Screens)</div>
           {memberBScreens.map((id) => {
             const item = SCREEN_META[id];
             const isActive = currentScreenId === id;
@@ -277,26 +351,24 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
 
             {/* Top Status Bar */}
             <div className="device-statusbar">
-              <span id="statusbar-left">08:46 AM | Boroondara SafeNet</span>
               <span className="sla-pill">SLA: 0.38s Live Cloud Sync</span>
             </div>
 
             {/* App Header */}
             <div className="app-header">
               <div className="app-header-top">
-                <span className="school-title">
-                  Hartwell Primary School — Sustainable Travel System
-                </span>
-                <span className="contrast-tag" id="contrast-indicator">
-                  {scheme === 'scheme-a'
-                    ? '7.2:1 Contrast (Scheme A)'
-                    : '11.4:1 WCAG AAA (Scheme B)'}
-                </span>
+                <div className="app-brand">
+                  <span
+                    className="school-logo"
+                    role="img"
+                    aria-label="Hartwell Primary School stag crest"
+                  ></span>
+                  <span className="school-title">
+                    Hartwell Primary School — Sustainable Travel System
+                  </span>
+                </div>
               </div>
-              <div className="screen-subtitle-bar">
-                <span id="header-screen-title">{meta.title}</span>
-                <span id="header-owner-badge">{meta.owner}</span>
-              </div>
+              <div className="screen-subtitle-bar"></div>
             </div>
 
             {/* Screen Body */}
@@ -328,7 +400,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                         <button
                           type="button"
                           className="seg-btn"
-                          onClick={() => navigateToScreen('s7')}
+                          onClick={() => router.push('/parent-login')}
                         >
                           Parent (PC/App)
                         </button>
@@ -338,9 +410,9 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                         <button
                           type="button"
                           className="seg-btn"
-                          onClick={() => navigateToScreen('s8')}
+                          onClick={() => router.push('/admin-login')}
                         >
-                          Teacher (Smartboard)
+                          Staff / Admin
                         </button>
                       </div>
                     </div>
@@ -1314,12 +1386,209 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
               </div>
             </div>
 
-            {/* Persistent 5-Tab Bottom Navigation Bar */}
+            {/* ==================== SETTINGS SHEET & LOGOUT MODAL ==================== */}
+            <div
+              className={`settings-backdrop ${settingsOpen ? 'open' : ''}`}
+              id="settings-panel"
+              onClick={(e) => {
+                if ((e.target as HTMLElement).id === 'settings-panel') {
+                  setSettingsOpen(false);
+                }
+              }}
+            >
+              <section
+                className="settings-sheet"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="settings-title"
+              >
+                <div
+                  id="settings-main"
+                  style={{ display: accountDetailsOpen ? 'none' : undefined }}
+                >
+                  <div className="settings-header">
+                    <div>
+                      <div className="settings-kicker">Preferences</div>
+                      <h2 className="settings-title" id="settings-title">
+                        Settings
+                      </h2>
+                    </div>
+                    <button
+                      className="settings-close"
+                      type="button"
+                      onClick={() => setSettingsOpen(false)}
+                      aria-label="Close settings"
+                    >
+                      &times;
+                    </button>
+                  </div>
+
+                  <div className="account-summary">
+                    <div className="account-avatar" aria-hidden="true">
+                      {activeUser.initials}
+                    </div>
+                    <div>
+                      <div className="account-summary-name">{activeUser.name}</div>
+                      <div className="account-summary-role">{activeUser.roleLabel}</div>
+                    </div>
+                  </div>
+
+                  <div className="settings-list">
+                    <div className="settings-row">
+                      <div className="settings-row-copy">
+                        <strong>High contrast</strong>
+                        <span>Increase colour and border contrast</span>
+                      </div>
+                      <button
+                        className="settings-switch"
+                        id="contrast-toggle"
+                        type="button"
+                        aria-label="High contrast"
+                        aria-pressed={highContrast}
+                        onClick={() => setHighContrast((prev) => !prev)}
+                      ></button>
+                    </div>
+                    <div className="settings-row">
+                      <div className="settings-row-copy">
+                        <strong>Bigger text</strong>
+                        <span>Enlarge text across the app</span>
+                      </div>
+                      <button
+                        className="settings-switch"
+                        id="text-size-toggle"
+                        type="button"
+                        aria-label="Bigger text"
+                        aria-pressed={largeText}
+                        onClick={() => setLargeText((prev) => !prev)}
+                      ></button>
+                    </div>
+                    <button
+                      className="settings-row"
+                      type="button"
+                      onClick={() => setAccountDetailsOpen(true)}
+                    >
+                      <span className="settings-row-copy">
+                        <strong>Account</strong>
+                        <span>View your profile and access level</span>
+                      </span>
+                      <span className="settings-chevron" aria-hidden="true">
+                        &rsaquo;
+                      </span>
+                    </button>
+                    <button
+                      className="settings-row settings-logout"
+                      type="button"
+                      onClick={() => {
+                        setLogoutConfirmed(false);
+                        setLogoutModalOpen(true);
+                      }}
+                    >
+                      <span className="settings-row-copy">
+                        <strong>Log out</strong>
+                        <span>Sign out of this device</span>
+                      </span>
+                      <span className="settings-chevron" aria-hidden="true">
+                        &rsaquo;
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  className={`account-details ${accountDetailsOpen ? 'open' : ''}`}
+                  id="account-details"
+                >
+                  <button
+                    className="account-back"
+                    type="button"
+                    onClick={() => setAccountDetailsOpen(false)}
+                  >
+                    &larr; Back to settings
+                  </button>
+                  <div className="settings-header">
+                    <div>
+                      <div className="settings-kicker">Your profile</div>
+                      <h2 className="settings-title">Account</h2>
+                    </div>
+                  </div>
+                  <div className="account-detail-card">
+                    <div>
+                      <div className="account-detail-label">Name</div>
+                      <div className="account-detail-value">{activeUser.name}</div>
+                    </div>
+                    <div>
+                      <div className="account-detail-label">Email</div>
+                      <div className="account-detail-value">{activeUser.email}</div>
+                    </div>
+                    <div>
+                      <div className="account-detail-label">Role</div>
+                      <div className="account-detail-value">{activeUser.roleLabel}</div>
+                    </div>
+                    <div>
+                      <div className="account-detail-label">Access</div>
+                      <div className="account-detail-value">{activeUser.accessSummary}</div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <div className={`modal-backdrop ${logoutModalOpen ? 'open' : ''}`} id="logout-modal">
+              <div
+                className="modal-card logout-card"
+                role="alertdialog"
+                aria-modal="true"
+                aria-labelledby="logout-title"
+              >
+                <div className="modal-title" id="logout-title">
+                  {logoutConfirmed ? 'You are logged out' : 'Log out of this device?'}
+                </div>
+                <div className="modal-desc" id="logout-description">
+                  {logoutConfirmed
+                    ? 'Your session has ended safely on this device.'
+                    : 'You will need to sign in again to access school travel information.'}
+                </div>
+                <div
+                  className="modal-actions"
+                  id="logout-actions"
+                  style={{ gridTemplateColumns: logoutConfirmed ? '1fr' : undefined }}
+                >
+                  <button
+                    className="btn-cancel"
+                    id="logout-cancel"
+                    type="button"
+                    onClick={() => setLogoutModalOpen(false)}
+                  >
+                    {logoutConfirmed ? 'Done' : 'Cancel'}
+                  </button>
+                  {!logoutConfirmed && (
+                    <button
+                      className="btn-confirm-logout"
+                      id="logout-confirm"
+                      type="button"
+                      onClick={() => {
+                        try {
+                          sessionStorage.removeItem('hartwell_demo_user');
+                        } catch {
+                          // ignore
+                        }
+                        setLogoutConfirmed(true);
+                        setSettingsOpen(false);
+                      }}
+                    >
+                      Log out
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Persistent 6-Tab Bottom Navigation Bar */}
             <nav className="bottom-nav">
               <Link
                 href="/s1"
                 className={`tab-btn ${
-                  ['s1', 's2', 's3'].includes(currentScreenId) ? 'active' : ''
+                  !settingsOpen && ['s1', 's2', 's3'].includes(currentScreenId) ? 'active' : ''
                 }`}
                 id="tab-home"
                 onClick={(e) => {
@@ -1328,11 +1597,13 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                 }}
               >
                 <span>🔒</span>
-                <span>S1–S3 Track</span>
+                <span> Track</span>
               </Link>
               <Link
                 href="/s4"
-                className={`tab-btn ${currentScreenId === 's4' ? 'active' : ''}`}
+                className={`tab-btn ${
+                  !settingsOpen && currentScreenId === 's4' ? 'active' : ''
+                }`}
                 id="tab-weather"
                 onClick={(e) => {
                   e.preventDefault();
@@ -1340,11 +1611,13 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                 }}
               >
                 <span>⛈</span>
-                <span>S4 Weather</span>
+                <span> Weather</span>
               </Link>
               <Link
                 href="/s5"
-                className={`tab-btn ${currentScreenId === 's5' ? 'active' : ''}`}
+                className={`tab-btn ${
+                  !settingsOpen && currentScreenId === 's5' ? 'active' : ''
+                }`}
                 id="tab-reroute"
                 onClick={(e) => {
                   e.preventDefault();
@@ -1352,12 +1625,12 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                 }}
               >
                 <span>⚠</span>
-                <span>S5 CR-01</span>
+                <span>Reroute</span>
               </Link>
               <Link
                 href="/s7"
                 className={`tab-btn ${
-                  ['s6', 's7'].includes(currentScreenId) ? 'active' : ''
+                  !settingsOpen && ['s6', 's7'].includes(currentScreenId) ? 'active' : ''
                 }`}
                 id="tab-parent"
                 onClick={(e) => {
@@ -1366,12 +1639,12 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                 }}
               >
                 <span>📍</span>
-                <span>S7 Parent PC/App</span>
+                <span> Parent PC/App</span>
               </Link>
               <Link
                 href="/s8"
                 className={`tab-btn ${
-                  ['s8', 's9'].includes(currentScreenId) ? 'active' : ''
+                  !settingsOpen && ['s8', 's9'].includes(currentScreenId) ? 'active' : ''
                 }`}
                 id="tab-privacy"
                 onClick={(e) => {
@@ -1380,8 +1653,29 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
                 }}
               >
                 <span>🏆</span>
-                <span>S8–S9 Whiteboard</span>
+                <span> Whiteboard</span>
               </Link>
+              <button
+                className={`tab-btn ${settingsOpen ? 'active' : ''}`}
+                id="tab-settings"
+                type="button"
+                aria-controls="settings-panel"
+                aria-expanded={settingsOpen}
+                onClick={() => {
+                  if (settingsOpen) {
+                    setSettingsOpen(false);
+                  } else {
+                    setAccountDetailsOpen(false);
+                    setSettingsOpen(true);
+                  }
+                }}
+              >
+                <svg className="tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"></path>
+                </svg>
+                <span>Settings</span>
+              </button>
             </nav>
           </div>
         </main>
@@ -1417,7 +1711,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
               <span>v2.3 — Smartboard S8, S6–S9 &amp; CR-01</span>
               <span className="vh-time">06 Nov, 16:15</span>
             </div>
-            <div className="vh-author">Member B (Partner — 0.5 S5 + S6, S7, S8, S9)</div>
+            <div className="vh-author">Kim Le (Partner — 0.5 S5 + S6, S7, S8, S9)</div>
             <div className="vh-desc">
               Built S6 Hub Roll Call &amp; KPIs, S7 Parent Geofence Portal, S8 Classroom
               Smartboard Golden Boot Leaderboard + 08:00–09:00 AM GPS window, and S9 Locked PII
@@ -1430,7 +1724,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
               <span>v2.2 — Client Change Request CR-01 (S5)</span>
               <span className="vh-time">05 Nov, 20:10</span>
             </div>
-            <div className="vh-author">Sofia Mironenko + Member B (Co-Owned S5 Bridge)</div>
+            <div className="vh-author">Sofia Mironenko + Kim Le (Co-Owned S5 Bridge)</div>
             <div className="vh-desc">
               Connected Sofia M.&apos;s S4 BOM Weather Squall trigger to S5 Myrtle Park Greenway
               500m Hub override and Member B&apos;s S7 Live Parent Map alert.
@@ -1442,7 +1736,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
               <span>v2.0 — Client Colour Scheme B Swap</span>
               <span className="vh-time">04 Nov, 14:30</span>
             </div>
-            <div className="vh-author">Sofia Mironenko + Member B (Client: Akrati Jain)</div>
+            <div className="vh-author">Sofia Mironenko + Kim Le (Client: Akrati Jain)</div>
             <div className="vh-desc">
               Swapped global design tokens from Scheme A (#1E3A8A Navy) to Client-Selected Scheme
               B (#1B5E20 Eco-Safe Green, 11.4:1 AAA) across all 9 screens in &lt;10s.
@@ -1454,7 +1748,7 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
               <span>v1.0 — Initial SRS Baseline (4.5 Screens Each)</span>
               <span className="vh-time">02 Nov, 11:00</span>
             </div>
-            <div className="vh-author">Sofia Mironenko (4.5) &amp; Member B (4.5)</div>
+            <div className="vh-author">Sofia Mironenko (4.5) &amp; Kim Le (4.5)</div>
             <div className="vh-desc">
               Established shared Auto-Layout master navigation bar and equal 2-member attribution
               across UC-01 through UC-09.
