@@ -3,6 +3,16 @@
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  Paper,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import '../auth.css';
 
 export type AuthVariant = 'parent-login' | 'parent-signup' | 'admin-login';
@@ -75,47 +85,185 @@ function EyeOffIcon() {
 export default function AuthPageView({ variant }: { variant: AuthVariant }) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
-  const statusRef = useRef<HTMLParagraphElement>(null);
+  const statusRef = useRef<HTMLDivElement>(null);
 
   const [showPass1, setShowPass1] = useState(false);
   const [showPass2, setShowPass2] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
 
-  const fillDemoAccount = (account: DemoAccount) => {
+  const loginWithDemo = (account: DemoAccount, immediate = false) => {
     const form = formRef.current;
-    if (!form) return;
+    if (form) {
+      const emailInput = form.querySelector<HTMLInputElement>('input[name="email"]');
+      const passInput = form.querySelector<HTMLInputElement>('input[name="password"]');
 
-    const emailInput = form.querySelector<HTMLInputElement>('input[name="email"]');
-    const passInput = form.querySelector<HTMLInputElement>('input[name="password"]');
+      if (emailInput) {
+        emailInput.value = account.email;
+        emailInput.setAttribute('aria-invalid', 'false');
+      }
+      if (passInput) {
+        passInput.value = account.password;
+        passInput.setAttribute('aria-invalid', 'false');
+      }
 
-    if (emailInput) {
-      emailInput.value = account.email;
-      emailInput.setAttribute('aria-invalid', 'false');
+      if (variant === 'parent-signup') {
+        const firstInput = form.querySelector<HTMLInputElement>('input[name="firstName"]');
+        const lastInput = form.querySelector<HTMLInputElement>('input[name="lastName"]');
+        const confirmInput = form.querySelector<HTMLInputElement>('input[name="confirmPassword"]');
+        const consentInput = form.querySelector<HTMLInputElement>('input[name="consent"]');
+        if (firstInput) firstInput.value = 'Sarah';
+        if (lastInput) lastInput.value = 'Mitchell';
+        if (confirmInput) confirmInput.value = account.password;
+        if (consentInput) consentInput.checked = true;
+      }
+
+      form.querySelectorAll<HTMLElement>('.field-error').forEach((el) => {
+        el.style.display = 'none';
+      });
     }
-    if (passInput) {
-      passInput.value = account.password;
-      passInput.setAttribute('aria-invalid', 'false');
-    }
 
-    if (variant === 'parent-signup') {
-      const firstInput = form.querySelector<HTMLInputElement>('input[name="firstName"]');
-      const lastInput = form.querySelector<HTMLInputElement>('input[name="lastName"]');
-      const confirmInput = form.querySelector<HTMLInputElement>('input[name="confirmPassword"]');
-      const consentInput = form.querySelector<HTMLInputElement>('input[name="consent"]');
-      if (firstInput) firstInput.value = 'Sarah';
-      if (lastInput) lastInput.value = 'Mitchell';
-      if (confirmInput) confirmInput.value = account.password;
-      if (consentInput) consentInput.checked = true;
+    if (immediate) {
+      try {
+        sessionStorage.setItem('hartwell_demo_user', JSON.stringify(account));
+      } catch {
+        // ignore storage errors
+      }
+      setStatusMessage(
+        `Signed in as ${account.name} (${account.roleLabel}). Opening ${account.targetTitle}...`
+      );
+      router.push(account.targetRoute);
+      return;
     }
-
-    form.querySelectorAll<HTMLElement>('.field-error').forEach((el) => {
-      el.style.display = 'none';
-    });
 
     setStatusMessage(
-      `Demo credentials loaded for ${account.name} (${account.roleLabel}). Click submit to open ${account.targetTitle}.`
+      `Demo credentials filled for ${account.name} (${account.roleLabel}). Click submit or "Launch Portal" to open ${account.targetTitle}.`
     );
   };
+
+  const renderDemoCard = (accounts: DemoAccount[], title: string) => (
+    <Paper
+      elevation={0}
+      aria-label={title}
+      sx={{
+        mb: 3,
+        p: 2,
+        borderRadius: 3,
+        border: '1px solid #b9d8c1',
+         bgcolor: '#e9f4ec',
+      }}
+    >
+      <Stack
+        direction="row"
+        spacing={1}
+        sx={{
+          mb: 1.5,
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 0.5,
+        }}
+      >
+        <Typography
+          sx={{
+            color: '#123e2b',
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+          }}
+        >
+          {title}
+        </Typography>
+        <Chip
+          label="MUI Stakeholder Demo Ready"
+          size="small"
+          sx={{
+            height: 22,
+            fontSize: 10.5,
+            fontWeight: 800,
+            bgcolor: '#123e2b',
+            color: '#ffffff',
+          }}
+        />
+      </Stack>
+
+      <Stack spacing={1.25}>
+        {accounts.map((acc) => (
+          <Paper
+            key={acc.id}
+            elevation={0}
+            sx={{
+              p: 1.5,
+              borderRadius: 2.5,
+              border: '1px solid #cbd7cf',
+              bgcolor: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: 1.25,
+            }}
+          >
+            <Box sx={{ minWidth: 180 }}>
+              <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+                <Typography sx={{ fontSize: 13, fontWeight: 800, color: '#123e2b' }}>
+                  {acc.name}
+                </Typography>
+                <Chip
+                  label={acc.roleLabel}
+                  size="small"
+                  variant="outlined"
+                  sx={{
+                    height: 20,
+                    fontSize: 10.5,
+                    fontWeight: 700,
+                    borderColor: '#2f7d4d',
+                    color: '#123e2b',
+                  }}
+                />
+              </Stack>
+              <Typography
+                sx={{
+                  fontSize: 11.5,
+                  color: '#647069',
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                  mt: 0.35,
+                }}
+              >
+                {acc.email} &bull; {acc.password}
+              </Typography>
+            </Box>
+
+            <Stack direction="row" spacing={1}>
+              <Tooltip title="Populate form fields with this demo persona">
+                <Button
+                  size="small"
+                  variant="outlined"
+                  color="primary"
+                  onClick={() => loginWithDemo(acc, false)}
+                  sx={{ fontSize: 12, py: 0.5, px: 1.25 }}
+                >
+                  Auto-fill
+                </Button>
+              </Tooltip>
+              <Tooltip title={`Sign in immediately and open ${acc.targetTitle}`}>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  disableElevation
+                  onClick={() => loginWithDemo(acc, true)}
+                  sx={{ fontSize: 12, py: 0.5, px: 1.5 }}
+                >
+                  Launch {acc.targetRoute.toUpperCase()} &rarr;
+                </Button>
+              </Tooltip>
+            </Stack>
+          </Paper>
+        ))}
+      </Stack>
+    </Paper>
+  );
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -283,24 +431,7 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
               <Link href="/admin-login">Staff &amp; admin</Link>
             </nav>
 
-            <div className="demo-accounts" aria-label="Demo parent account">
-              <p className="demo-accounts-title">Quick-Fill Demo Account</p>
-              <div className="demo-accounts-grid">
-                <button
-                  type="button"
-                  className="demo-account-btn"
-                  onClick={() => fillDemoAccount(DEMO_ACCOUNTS.parent)}
-                >
-                  <span className="demo-account-role">
-                    Parent: {DEMO_ACCOUNTS.parent.name} &rarr; S7
-                  </span>
-                  <span className="demo-account-creds">{DEMO_ACCOUNTS.parent.email}</span>
-                  <span className="demo-account-creds">
-                    Pass: {DEMO_ACCOUNTS.parent.password}
-                  </span>
-                </button>
-              </div>
-            </div>
+            {renderDemoCard([DEMO_ACCOUNTS.parent], 'Quick-Fill Parent Demo Account')}
 
             <form ref={formRef} data-auth-form onSubmit={handleSubmit} noValidate>
               <div className="field">
@@ -357,15 +488,17 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
               <button className="submit-button" type="submit">
                 Sign in to parent portal
               </button>
-              <p
-                ref={statusRef}
-                className="form-status"
-                role="status"
-                tabIndex={-1}
-                style={{ display: statusMessage ? 'block' : 'none' }}
-              >
-                {statusMessage}
-              </p>
+              {statusMessage && (
+                <Alert
+                  ref={statusRef}
+                  severity="success"
+                  role="status"
+                  tabIndex={-1}
+                  sx={{ mt: 2, borderRadius: 2.5, fontWeight: 700, fontSize: 12.5 }}
+                >
+                  {statusMessage}
+                </Alert>
+              )}
             </form>
 
             <p className="form-footnote">
@@ -470,21 +603,7 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
               record.
             </p>
 
-            <div className="demo-accounts" aria-label="Demo parent registration">
-              <p className="demo-accounts-title">Quick-Fill Demo Registration</p>
-              <div className="demo-accounts-grid">
-                <button
-                  type="button"
-                  className="demo-account-btn"
-                  onClick={() => fillDemoAccount(DEMO_ACCOUNTS.parent)}
-                >
-                  <span className="demo-account-role">
-                    Pre-fill Sarah Mitchell (Parent of Leo &amp; Sophie)
-                  </span>
-                  <span className="demo-account-creds">{DEMO_ACCOUNTS.parent.email}</span>
-                </button>
-              </div>
-            </div>
+            {renderDemoCard([DEMO_ACCOUNTS.parent], 'Quick-Fill Parent Registration Demo')}
 
             <form ref={formRef} data-auth-form onSubmit={handleSubmit} noValidate>
               <div className="field-row">
@@ -610,15 +729,17 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
               <button className="submit-button" type="submit">
                 Create parent account
               </button>
-              <p
-                ref={statusRef}
-                className="form-status"
-                role="status"
-                tabIndex={-1}
-                style={{ display: statusMessage ? 'block' : 'none' }}
-              >
-                {statusMessage}
-              </p>
+              {statusMessage && (
+                <Alert
+                  ref={statusRef}
+                  severity="success"
+                  role="status"
+                  tabIndex={-1}
+                  sx={{ mt: 2, borderRadius: 2.5, fontWeight: 700, fontSize: 12.5 }}
+                >
+                  {statusMessage}
+                </Alert>
+              )}
             </form>
 
             <p className="form-footnote">
@@ -744,37 +865,10 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
             </span>
           </div>
 
-          <div className="demo-accounts" aria-label="Demo staff and admin accounts">
-            <p className="demo-accounts-title">Quick-Fill Demo Accounts (Teacher &amp; Admin)</p>
-            <div className="demo-accounts-grid">
-              <button
-                type="button"
-                className="demo-account-btn"
-                onClick={() => fillDemoAccount(DEMO_ACCOUNTS.teacher)}
-              >
-                <span className="demo-account-role">
-                  Teacher: {DEMO_ACCOUNTS.teacher.name} &rarr; S8
-                </span>
-                <span className="demo-account-creds">{DEMO_ACCOUNTS.teacher.email}</span>
-                <span className="demo-account-creds">
-                  Pass: {DEMO_ACCOUNTS.teacher.password}
-                </span>
-              </button>
-              <button
-                type="button"
-                className="demo-account-btn"
-                onClick={() => fillDemoAccount(DEMO_ACCOUNTS.admin)}
-              >
-                <span className="demo-account-role">
-                  Admin: {DEMO_ACCOUNTS.admin.name} &rarr; S6
-                </span>
-                <span className="demo-account-creds">{DEMO_ACCOUNTS.admin.email}</span>
-                <span className="demo-account-creds">
-                  Pass: {DEMO_ACCOUNTS.admin.password}
-                </span>
-              </button>
-            </div>
-          </div>
+          {renderDemoCard(
+            [DEMO_ACCOUNTS.teacher, DEMO_ACCOUNTS.admin],
+            'Quick-Fill Staff Demo Accounts (Teacher & Admin)'
+          )}
 
           <form ref={formRef} data-auth-form onSubmit={handleSubmit} noValidate>
             <div className="field">
@@ -831,15 +925,17 @@ export default function AuthPageView({ variant }: { variant: AuthVariant }) {
             <button className="submit-button" type="submit">
               Continue to admin portal
             </button>
-            <p
-              ref={statusRef}
-              className="form-status"
-              role="status"
-              tabIndex={-1}
-              style={{ display: statusMessage ? 'block' : 'none' }}
-            >
-              {statusMessage}
-            </p>
+            {statusMessage && (
+              <Alert
+                ref={statusRef}
+                severity="success"
+                role="status"
+                tabIndex={-1}
+                sx={{ mt: 2, borderRadius: 2.5, fontWeight: 700, fontSize: 12.5 }}
+              >
+                {statusMessage}
+              </Alert>
+            )}
           </form>
 
           <p className="form-footnote">

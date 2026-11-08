@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Button, Chip, Stack, Tooltip } from '@mui/material';
+import { DEMO_ACCOUNTS, DemoAccount } from './AuthPageView';
 import {
   ScreenId,
   ViewportMode,
@@ -173,6 +175,19 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
     router.push(`/${screenId}${qs ? `?${qs}` : ''}`, { scroll: false });
   };
 
+  const switchDemoPersona = (account: DemoAccount) => {
+    setActiveUser(account);
+    try {
+      sessionStorage.setItem('hartwell_demo_user', JSON.stringify(account));
+    } catch {
+      // ignore storage errors
+    }
+    const targetScreen = account.targetRoute.replace(/^\//, '') as ScreenId;
+    if (isValidScreenId(targetScreen)) {
+      navigateToScreen(targetScreen);
+    }
+  };
+
   const meta = SCREEN_META[currentScreenId] || SCREEN_META.s1;
 
   const isDesktopFrame =
@@ -206,6 +221,80 @@ export default function PrototypeWorkspace({ initialScreen = 's1' }: PrototypeWo
         </div>
 
         <div className="toolbar-controls">
+          {/* Material UI Stakeholder Demo Persona Bar */}
+          <Stack
+            direction="row"
+            spacing={0.75}
+            sx={{
+              alignItems: 'center',
+              bgcolor: '#0F172A',
+              border: '1px solid #475569',
+              borderRadius: '6px',
+              px: 1,
+              py: 0.4,
+            }}
+          >
+            <Chip
+              label={`Signed in: ${activeUser.name}`}
+              size="small"
+              sx={{
+                height: 22,
+                fontSize: 11,
+                fontWeight: 800,
+                bgcolor: '#1B5E20',
+                color: '#FFFFFF',
+              }}
+            />
+            <Tooltip title="Switch to Sarah Mitchell (Parent Demo — S7)">
+              <Button
+                size="small"
+                variant={activeUser.email === DEMO_ACCOUNTS.parent.email ? 'contained' : 'text'}
+                onClick={() => switchDemoPersona(DEMO_ACCOUNTS.parent)}
+                sx={{ minWidth: 0, px: 1, py: 0.25, fontSize: 11, color: '#E2E8F0' }}
+              >
+                Parent
+              </Button>
+            </Tooltip>
+            <Tooltip title="Switch to Ms. Lin (Teacher Demo — S8)">
+              <Button
+                size="small"
+                variant={activeUser.email === DEMO_ACCOUNTS.teacher.email ? 'contained' : 'text'}
+                onClick={() => switchDemoPersona(DEMO_ACCOUNTS.teacher)}
+                sx={{ minWidth: 0, px: 1, py: 0.25, fontSize: 11, color: '#E2E8F0' }}
+              >
+                Teacher
+              </Button>
+            </Tooltip>
+            <Tooltip title="Switch to Kim Le (Admin Demo — S6)">
+              <Button
+                size="small"
+                variant={activeUser.email === DEMO_ACCOUNTS.admin.email ? 'contained' : 'text'}
+                onClick={() => switchDemoPersona(DEMO_ACCOUNTS.admin)}
+                sx={{ minWidth: 0, px: 1, py: 0.25, fontSize: 11, color: '#E2E8F0' }}
+              >
+                Admin
+              </Button>
+            </Tooltip>
+            <Tooltip title="Open dedicated Parent / Staff Auth Pages">
+              <Button
+                component={Link}
+                href="/parent-login"
+                size="small"
+                variant="outlined"
+                sx={{
+                  minWidth: 0,
+                  px: 1,
+                  py: 0.2,
+                  fontSize: 11,
+                  borderColor: '#4ADE80',
+                  color: '#4ADE80',
+                }}
+              >
+                Auth Pages &rarr;
+              </Button>
+            </Tooltip>
+          </Stack>
+
           {/* Viewport Switcher: Auto / Mobile / Desktop / Whiteboard */}
           <div className="btn-group" title="Switch Viewport Form Factor">
             <button
